@@ -1,4 +1,4 @@
-# Full-Stack-Open-Exercises
+# Full Stack Open 2020 Exercises
 
 ### Part 0
 
