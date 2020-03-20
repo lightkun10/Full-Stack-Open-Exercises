@@ -1,0 +1,2 @@
+browser->server: HTTP POST to https://fullstack-exampleapp.herokuapp.com/new_note
+server->browser: URL-redirect HTTP GET to https://fullstack-exampleapp.herokuapp.com/notes
