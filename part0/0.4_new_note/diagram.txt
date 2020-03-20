@@ -8,7 +8,6 @@ server-->browser: main.css
 browser->server: HTTP GET https://fullstack-exampleapp.herokuapp.com/main.js
 server-->browser: main.js
 
-notes over browser:
 browser starts executing js-code
 that requests JSON data from server 
 end note
@@ -16,7 +15,6 @@ end note
 browser->server: HTTP GET https://fullstack-exampleapp.herokuapp.com/data.json
 server-->browser: data.json
 
-note over browser:
 browser executes the event handler
 that parses the response then
 rerenders notes to display
