@@ -7,9 +7,15 @@ const App = () => {
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
 
+
   const voteGood = () => setGood(good + 1)
   const voteNeutral = () => setNeutral(neutral + 1)
   const voteBad = () => setBad(bad + 1)
+
+  const total = good + neutral + bad
+  const avg = isNaN((good - bad) / total) ? "" : (good - bad) / total
+  const posPercent = isNaN(((good / total) * 100).toFixed(13)) ? "" : ((good / total) * 100).toFixed(13)
+
 
   return (
     <div className="container">
@@ -27,6 +33,10 @@ const App = () => {
         <StatisticDisplay text="good" stats={good} />
         <StatisticDisplay text="neutral" stats={neutral} />
         <StatisticDisplay text="bad" stats={bad} />
+
+        <StatisticDisplay text="all" stats={total} />
+        <StatisticDisplay text="average" stats={avg} />
+        <StatisticDisplay text="positive" stats={posPercent} />
       </div>
 
     </div>
