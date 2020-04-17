@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 
 const App = (props) => {
   const [selected, setSelected] = useState(0)
+  const [votes, setVotes] = useState(newFilledArray(anecdotes.length, 0))
 
   // Generate random anecdotes.
   const generateAnec = () => {
@@ -13,13 +14,20 @@ const App = (props) => {
     setSelected(randNum)
   }
 
-  console.log(selected)
+  const voteUp = () => {
+    let copyVotes = [...votes]
+    // Increment the currently used at state.
+    copyVotes[selected] += 1
+    setVotes(copyVotes)
+  }
 
   return (
     <div>
       {props.anecdotes[selected]}
+      <div>has {votes[selected]} votes</div>
 
       <div>
+        <Button onClick={() => voteUp()} text="vote" />
         <Button onClick={() => generateAnec()} text="next anecdote" />
       </div>
     </div>
@@ -28,6 +36,16 @@ const App = (props) => {
 
 const Button = ({ onClick, text }) =>
   <button onClick={onClick}>{text}</button>
+
+// Create a zero-filled array of a desired length.
+// https://jsperf.com/zeroarrayjs
+function newFilledArray(len, val) {
+  let rv = new Array(len);
+  while (--len >= 0) {
+    rv[len] = val;
+  }
+  return rv;
+}
 
 
 const anecdotes = [
