@@ -9,5 +9,4 @@
 ### Part 1
 - 1.1 - 1.5 Course Information
 - 1.6 - 1.11 Unicafe
-- 1.12 Anecdotes
-- 1.13 Anecdotes
+- 1.12 - 1.14 Anecdotes
