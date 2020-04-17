@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom'
 
-const App = (props) => {
+const App = ({ anecdotes }) => {
   const [selected, setSelected] = useState(0)
   const [votes, setVotes] = useState(newFilledArray(anecdotes.length, 0))
 
@@ -21,15 +21,29 @@ const App = (props) => {
     setVotes(copyVotes)
   }
 
+  const getMaxValue = (array) => Math.max(...array)
+
+  // Find the index of vote where it has the most votes
+  const getIndexMostVoted = (array) => {
+    let maxVal = getMaxValue(array)
+    // return index of where max value is in the array
+    return array.indexOf(maxVal)
+  }
+
   return (
     <div>
-      {props.anecdotes[selected]}
+      <Header text="Anecdote of the day" />
+      {anecdotes[selected]}
       <div>has {votes[selected]} votes</div>
 
       <div>
         <Button onClick={() => voteUp()} text="vote" />
         <Button onClick={() => generateAnec()} text="next anecdote" />
       </div>
+
+      <Header text="Anecdote with most votes" />
+      {anecdotes[getIndexMostVoted(votes)]}
+      <div>has {votes[getIndexMostVoted(votes)]} votes</div>
     </div>
   )
 }
@@ -37,12 +51,16 @@ const App = (props) => {
 const Button = ({ onClick, text }) =>
   <button onClick={onClick}>{text}</button>
 
+const Header = ({ text }) => {
+  return <h1>{text}</h1>
+}
+
 // Create a zero-filled array of a desired length.
 // https://jsperf.com/zeroarrayjs
-function newFilledArray(len, val) {
-  let rv = new Array(len);
-  while (--len >= 0) {
-    rv[len] = val;
+function newFilledArray(length, val) {
+  let rv = new Array(length);
+  while (--length >= 0) {
+    rv[length] = val;
   }
   return rv;
 }
