@@ -43,15 +43,17 @@ const Statistics = ({ good, neutral, bad }) => {
   }
 
   return (
-    <div className="statistics">
-      <Statistic text="good" value={good} />
-      <Statistic text="neutral" value={neutral} />
-      <Statistic text="bad" value={bad} />
+    <table>
+      <tbody>
+        <Statistic text="good" value={good} />
+        <Statistic text="neutral" value={neutral} />
+        <Statistic text="bad" value={bad} />
 
-      <Statistic text="all" value={total} />
-      <Statistic text="average" value={avg} />
-      <Statistic text="positive" value={posPercent} />
-    </div>
+        <Statistic text="all" value={total} />
+        <Statistic text="average" value={avg} />
+        <Statistic text="positive" value={posPercent + "%"} />
+      </tbody>
+    </table>
   )
 }
 
@@ -65,9 +67,10 @@ const Button = ({ handleClick, text }) => {
 
 const Statistic = ({ text, value }) => {
   return (
-    <div>
-      {text} {value}
-    </div>
+    <tr>
+      <td>{text}</td>
+      <td>{value}</td>
+    </tr>
   )
 }
 
