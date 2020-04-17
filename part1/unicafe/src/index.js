@@ -16,6 +16,26 @@ const App = () => {
   const avg = isNaN((good - bad) / total) ? "" : (good - bad) / total
   const posPercent = isNaN(((good / total) * 100).toFixed(13)) ? "" : ((good / total) * 100).toFixed(13)
 
+  if (total === 0) {
+    return (
+      <div className="container">
+
+        <div className="feedbacks">
+          <h1>give feedback</h1>
+          <Button handleClick={() => voteGood()} text="good" />
+          <Button handleClick={() => voteNeutral()} text="neutral" />
+          <Button handleClick={() => voteBad()} text="bad" />
+        </div>
+
+
+        <div className="statistics">
+          <h1>statistics</h1>
+          <div>No feedback given</div>
+        </div>
+
+      </div>
+    )
+  }
 
   return (
     <div className="container">
@@ -30,13 +50,13 @@ const App = () => {
 
       <div className="statistics">
         <h1>statistics</h1>
-        <StatisticDisplay text="good" stats={good} />
-        <StatisticDisplay text="neutral" stats={neutral} />
-        <StatisticDisplay text="bad" stats={bad} />
+        <Statistics text="good" stats={good} />
+        <Statistics text="neutral" stats={neutral} />
+        <Statistics text="bad" stats={bad} />
 
-        <StatisticDisplay text="all" stats={total} />
-        <StatisticDisplay text="average" stats={avg} />
-        <StatisticDisplay text="positive" stats={posPercent} />
+        <Statistics text="all" stats={total} />
+        <Statistics text="average" stats={avg} />
+        <Statistics text="positive" stats={posPercent} />
       </div>
 
     </div>
@@ -51,7 +71,7 @@ const Button = ({ handleClick, text }) => {
   )
 }
 
-const StatisticDisplay = ({ text, stats }) => {
+const Statistics = ({ text, stats }) => {
   return (
     <div>
       {text} {stats}
