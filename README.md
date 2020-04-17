@@ -13,5 +13,4 @@
 - 1.3: course information, step3
 - 1.4: course information, step4
 - 1.5: course information, step5
-
 - 1.6: unicafe step1
