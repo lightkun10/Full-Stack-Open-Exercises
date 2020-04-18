@@ -7,28 +7,24 @@ const App = ({ anecdotes }) => {
 
   // Generate random anecdotes.
   const generateAnec = () => {
-    // generate random number for the index of selected anecdotes.
+    // Generate random number for the index of selected anecdotes.
     const randNum = Math.floor(Math.random() * anecdotes.length)
 
     // Set state to the random generated number as index.
     setSelected(randNum)
   }
 
-  const voteUp = () => {
+  const upVote = () => {
     let copyVotes = [...votes]
-    // Increment the currently used at state.
     copyVotes[selected] += 1
     setVotes(copyVotes)
   }
 
-  const getMaxValue = (array) => Math.max(...array)
+  // Get the most votes number among all votes array.
+  const maxVotes = ary => Math.max.apply(null, ary)
 
-  // Find the index of vote where it has the most votes
-  const getIndexMostVoted = (array) => {
-    let maxVal = getMaxValue(array)
-    // return index of where max value is in the array
-    return array.indexOf(maxVal)
-  }
+  /* Get the index of the most voted quotes in the votes array. */
+  const getIndexMostVote = (ary) => ary.indexOf(maxVotes(ary))
 
   return (
     <div>
@@ -37,13 +33,13 @@ const App = ({ anecdotes }) => {
       <div>has {votes[selected]} votes</div>
 
       <div>
-        <Button onClick={() => voteUp()} text="vote" />
+        <Button onClick={() => upVote()} text="vote" />
         <Button onClick={() => generateAnec()} text="next anecdote" />
       </div>
 
       <Header text="Anecdote with most votes" />
-      {anecdotes[getIndexMostVoted(votes)]}
-      <div>has {votes[getIndexMostVoted(votes)]} votes</div>
+      {anecdotes[getIndexMostVote(votes)]}
+      <div>has {votes[getIndexMostVote(votes)]} votes</div>
     </div>
   )
 }
