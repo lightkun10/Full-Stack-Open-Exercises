@@ -1,7 +1,7 @@
 import React from 'react';
 
 const Course = ({ course }) => {
-    // console.log(course.course.id)
+    /* Pass the course name and parts */
     return (
         <div>
             <Header course={course.name} />
@@ -39,11 +39,17 @@ const Part = ({ name, exercises }) => {
 }
 
 const Total = ({ parts }) => {
-    // Using forloop because faster...
-    let total = 0;
-    for (let i = 0; i < parts.length; i++) {
-        total += parts[i].exercises;
-    }
+    /* Using forloop */
+    // let total_forLoop = 0;
+    // for (let i = 0; i < parts.length; i++) {
+    //     total_forLoop += parts[i].exercises;
+    // }
+
+    /* Using reduce */
+    const total = parts.reduce((sum, part) => {
+        return sum + part.exercises
+    }, 0)
+
 
     return <h4>total of {total} exercises</h4>
 }
