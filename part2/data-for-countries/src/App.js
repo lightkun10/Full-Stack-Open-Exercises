@@ -48,9 +48,7 @@ function App() {
     else {
       return (
         <div>
-          <ul>
-            {filteredResult.map(country => <CountriesData country={country} />)}
-          </ul>
+          {filteredResult.map(country => <CountriesData key={country.name} country={country} />)}
         </div>
       )
     }
