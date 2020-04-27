@@ -11,9 +11,11 @@ const CountriesData = ({ country }) => {
     return (
         <div key={country.name}>
             {country.name}
+
             <button onClick={() => setShowDetails(!showDetails)}>
                 {!showDetails ? "show" : "hide"}
             </button>
+
             {filterShowDetails}
         </div>
     )

@@ -31,8 +31,6 @@ function App() {
     ? countries
     : countries.filter((country) => country.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
-  console.log(filteredResult);
-
   /* How can I display the desired filteredResult? */
   const displayResult = () => {
     if (filteredResult.length > 10) {
@@ -48,7 +46,9 @@ function App() {
     else {
       return (
         <div>
-          {filteredResult.map(country => <CountriesData key={country.name} country={country} />)}
+          {filteredResult.map(country =>
+            <CountriesData key={country.name} country={country} />
+          )}
         </div>
       )
     }
