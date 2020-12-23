@@ -3,7 +3,7 @@ import Header from './components/Header';
 import Filter from './components/Filter';
 import Form from './components/Form';
 import Result from './components/Result';
-import axios from 'axios';
+import numberService from './services/numbers';
 
 const App = () => {
   const [ persons, setPersons ] = useState([]);
@@ -14,16 +14,17 @@ const App = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    const eventHandler = (response) => {
+    const eventHandler = (initialNotes) => {
       console.log('promise fulfilled');
-      setPersons(response.data);
+      setPersons(initialNotes);
     }
 
     const errorHandler = (error) => {
-      console.log('promise rejected:\n', error);
+      console.log('Promise rejected');
+      alert(error);
     }
 
-    axios.get('http://localhost:3001/persons')
+    numberService.getAll()
       .then(eventHandler)
       .catch(errorHandler);
   }, []);
@@ -38,11 +39,19 @@ const App = () => {
 
     // Check if the same name already exist
     if (persons.find((person) => person.name === newName)) {
-      alert(`${newName} is already added to phonebook`)
+      alert(`${newName} is already added to phonebook`);
     } else {
-      setPersons(persons.concat(personObject));
-      setNewName('');
-      setNewNumber('');
+      numberService
+        .create(personObject)
+        .then((returnedNumber) => {
+          setPersons(persons.concat(returnedNumber));
+          setNewName('');
+          setNewNumber('');
+        })
+        .catch((error) => {
+          console.log('Promise rejected');
+          alert(error);
+        });
     }
   }
 
