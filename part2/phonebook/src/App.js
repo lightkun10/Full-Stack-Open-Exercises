@@ -30,6 +30,8 @@ const App = () => {
   }, []);
 
   const addPerson = (event) => {
+    const person = persons.find((person) => person.name === newName);
+    // console.log(person.name);
     event.preventDefault();
 
     const personObject = { 
@@ -37,9 +39,19 @@ const App = () => {
       number: newNumber, 
     };
 
-    // Check if the same name already exist
-    if (persons.find((person) => person.name === newName)) {
-      alert(`${newName} is already added to phonebook`);
+    // If the same name already exist,
+    if (person) {
+      // If the number are different, ask if user want to change
+      if(window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        numberService.update(personObject, person.id)
+        .then((returnedPerson) => {
+          // console.log(returnedPerson);
+          setPersons(persons.map((person) => person.id !== returnedPerson.id ? person : returnedPerson));
+          setNewName('');
+          setNewNumber('');
+        })
+        .catch((error) => console.log('An error occured', error));
+      }
     } else {
       numberService
         .create(personObject)
