@@ -1,64 +1,67 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios'
+import axios from 'axios';
 
-import Filter from './components/Filter'
-import CountryData from './components/CountryData'
-import CountriesData from './components/CountriesData';
+import Filter from './components/Filter';
+import CountryDetail from './components/CountryDetail';
+// import './App.css';
 
 function App() {
   const [countries, setCountries] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [filterTerm, setFilterTerm] = useState("");
 
   const hook = () => {
-    // console.log('"At first, there\'s nothing."')
-    // console.log('"...then Effect-hooks do its thing."')
-
     axios.get('https://restcountries.eu/rest/v2/all')
       .then((response) => {
         console.log("Promise fulfilled");
+        console.log(response);
         setCountries(response.data);
+      })
+      .catch((error) => {
+        console.log("Promise rejected");
+        console.log(error);
       });
-  };
+  }
 
   useEffect(hook, []);
 
   const handleFilterChange = (event) => {
-    setSearchTerm(event.target.value);
-  };
+    setFilterTerm(event.target.value);
+  }
 
-  // Filter the country query result.
-  const filteredResult = !searchTerm
+  const filteredResult = !filterTerm 
     ? countries
-    : countries.filter((country) => country.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    : countries.filter((country) => country.name.toLowerCase().includes(filterTerm.toLowerCase()));
 
-  /* How can I display the desired filteredResult? */
   const displayResult = () => {
-    if (filteredResult.length > 10) {
+    if (filteredResult.length > 10) { 
       return (
         <div>Too many matches, specify another filter</div>
       )
-    }
-    else if (filteredResult.length === 1) {
+    } else if (filteredResult.length === 1) {
       return (
-        <CountryData country={filteredResult[0]} />
+        <CountryDetail country={filteredResult[0]} />
       )
-    }
-    else {
+    } else {
       return (
-        <div>
-          {filteredResult.map(country =>
-            <CountriesData key={country.name} country={country} />
+        <div className="result-section__countries">
+          {filteredResult.map((country) => 
+            <div key={country.name}>{country.name}</div>
           )}
         </div>
       )
     }
   }
-
+  
+  console.log(filteredResult)
   return (
-    <div>
-      <Filter searchTerm={searchTerm} handleFilterChange={handleFilterChange} />
+    <div className="main">
+      <div className="filter-section">
+        <Filter filterTerm={filterTerm} handleFilterChange={handleFilterChange} />
+      </div>
 
-      {displayResult()}
+      <div className="result-section">
+        {displayResult()}
+      </div>
     </div>
   );
 }

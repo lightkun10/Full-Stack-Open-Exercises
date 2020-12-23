@@ -1,13 +1,11 @@
 import React from 'react';
 
-const Filter = ({ searchTerm, handleFilterChange }) => {
-    return (
-        <div>
-            find countries
-            <input value={searchTerm}
-                onChange={handleFilterChange}></input>
-        </div>
-    )
+const Filter = ({ filterTerm, handleFilterChange }) => {
+  return (
+    <div className="filter-section">
+      find countries <input value={filterTerm} onChange={handleFilterChange}></input>
+    </div>
+  )
 }
 
 export default Filter;

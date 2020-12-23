@@ -44,12 +44,10 @@ const App = ({ anecdotes }) => {
   )
 }
 
-const Button = ({ onClick, text }) =>
-  <button onClick={onClick}>{text}</button>
+const Button = ({ onClick, text }) => <button onClick={onClick}>{text}</button>;
 
-const Header = ({ text }) => {
-  return <h1>{text}</h1>
-}
+const Header = ({ text }) => <h1>{text}</h1>;
+
 
 // Create a zero-filled array of a desired length.
 // https://jsperf.com/zeroarrayjs
