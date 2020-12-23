@@ -55,6 +55,20 @@ const App = () => {
     }
   }
 
+  const deletePerson = (id) => {
+    const person = persons.find((person) => person.id === id);
+
+    if (window.confirm(`Delete ${person.name}?`)) {
+      console.log(`deleting ${person.name}...`);
+
+      numberService.deleteNumber(id)
+        .then(() => {
+          setPersons(persons.filter((person) => person.id !== id));
+        })
+        .catch((error) => console.log('An error occured', error));
+    }
+  }
+
   // Filter for person names
   const filtered = !searchTerm 
     ? persons 
@@ -86,7 +100,7 @@ const App = () => {
         handleNumberChange={handleNumberChange}
       />
 
-      <Result filtered={filtered} />
+      <Result filtered={filtered} deletePerson={deletePerson} />
     </div>
   )
 }
