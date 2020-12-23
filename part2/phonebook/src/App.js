@@ -30,10 +30,9 @@ const App = () => {
   }, []);
 
   const addPerson = (event) => {
-    const person = persons.find((person) => person.name === newName);
-    // console.log(person.name);
     event.preventDefault();
 
+    const person = persons.find((person) => person.name === newName);
     const personObject = { 
       name: newName,
       number: newNumber, 
