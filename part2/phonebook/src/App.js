@@ -3,6 +3,7 @@ import Header from './components/Header';
 import Filter from './components/Filter';
 import Form from './components/Form';
 import Result from './components/Result';
+import Notification from './components/Notification';
 import numberService from './services/numbers';
 
 const App = () => {
@@ -12,6 +13,7 @@ const App = () => {
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [successAddMessage, setSuccessAddMessage] = useState(null);
 
   useEffect(() => {
     const eventHandler = (initialNotes) => {
@@ -54,8 +56,15 @@ const App = () => {
     } else {
       numberService
         .create(personObject)
-        .then((returnedNumber) => {
-          setPersons(persons.concat(returnedNumber));
+        .then((returnedPerson) => {
+          // If promise for adding person fulfilled, 
+          // show the success message.
+          setSuccessAddMessage(`Added ${returnedPerson.name}`);
+          setTimeout(() => {
+            setSuccessAddMessage(null);
+          }, 4000);
+
+          setPersons(persons.concat(returnedPerson));
           setNewName('');
           setNewNumber('');
         })
@@ -100,6 +109,8 @@ const App = () => {
   return (
     <div>
       <Header text='Phonebook' />
+
+      <Notification message={successAddMessage} />
 
       <Filter searchTerm={searchTerm} handleFilterChange={handleFilterChange} />
 
