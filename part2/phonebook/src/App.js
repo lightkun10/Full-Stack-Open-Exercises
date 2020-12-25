@@ -13,7 +13,8 @@ const App = () => {
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [successAddMessage, setSuccessAddMessage] = useState(null);
+  const [message, setMessage] = useState(null);
+  const [messageType, setMessageType] = useState(null);
 
   useEffect(() => {
     const eventHandler = (initialNotes) => {
@@ -35,7 +36,7 @@ const App = () => {
     event.preventDefault();
 
     const person = persons.find((person) => person.name === newName);
-    const personObject = { 
+    const newPerson = { 
       name: newName,
       number: newNumber, 
     };
@@ -44,24 +45,34 @@ const App = () => {
     if (person) {
       // If the number are different, ask if user want to change
       if(window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
-        numberService.update(personObject, person.id)
-        .then((returnedPerson) => {
-          // console.log(returnedPerson);
-          setPersons(persons.map((person) => person.id !== returnedPerson.id ? person : returnedPerson));
-          setNewName('');
-          setNewNumber('');
-        })
-        .catch((error) => console.log('An error occured', error));
+        const updatePerson = { ...person, number: newNumber };
+        numberService.update(updatePerson)
+          .then((returnedPerson) => {
+            // console.log(returnedPerson);
+            setPersons(persons.map((person) => person.id !== returnedPerson.id ? person : returnedPerson));
+          })
+          .catch((error) => {
+            console.log('An error occured\n', error)
+            setMessageType('failed__delete');
+            setMessage(`Information of ${updatePerson.name} has already been removed from server`);
+            setTimeout(() => {
+              setMessage(null);
+              setMessageType(null);
+            }, 4000)
+          });
+        setNewName('');
+        setNewNumber('');
       }
     } else {
       numberService
-        .create(personObject)
+        .create(newPerson)
         .then((returnedPerson) => {
           // If promise for adding person fulfilled, 
           // show the success message.
-          setSuccessAddMessage(`Added ${returnedPerson.name}`);
+          setMessageType('success');
+          setMessage(`Added ${returnedPerson.name}`);
           setTimeout(() => {
-            setSuccessAddMessage(null);
+            setMessage(null);
           }, 4000);
 
           setPersons(persons.concat(returnedPerson));
@@ -110,7 +121,7 @@ const App = () => {
     <div>
       <Header text='Phonebook' />
 
-      <Notification message={successAddMessage} />
+      <Notification message={message} type={messageType} />
 
       <Filter searchTerm={searchTerm} handleFilterChange={handleFilterChange} />
 
