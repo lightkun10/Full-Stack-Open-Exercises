@@ -2,11 +2,27 @@
 
 ### Part 0
 
-- 0.4: new note
-- 0.5: Single page app
-- 0.6: New note
+- Single page app
+- New note
 
 ### Part 1
-- 1.1 - 1.5 Course Information
-- 1.6 - 1.11 Unicafe
-- 1.12 - 1.14 Anecdotes
+- Course Information
+- Unicafe
+- Anecdotes
+
+## Part 2
+- Course Contents
+- Data For Countries
+- Phonebook
+
+## Part 3
+- [Phonebook](https://github.com/lightkun10/Phonebook)
+
+## Part 4
+- [Bloglist: backend](https://github.com/lightkun10/Blog-List)
+
+## Part 5
+- [Bloglist: Full Stack](https://github.com/lightkun10/BlogList-FullStack)
+
+## Part 6
+- [Unicafe: Redux]('')
