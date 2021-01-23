@@ -25,4 +25,4 @@
 - [Bloglist: Full Stack](https://github.com/lightkun10/BlogList-FullStack)
 
 ## Part 6
-- [Unicafe: Redux]('')
+- Unicafe: Redux
