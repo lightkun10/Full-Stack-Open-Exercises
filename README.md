@@ -26,3 +26,4 @@
 
 ## Part 6
 - Unicafe: Redux
+- Anecdotes: Redux
