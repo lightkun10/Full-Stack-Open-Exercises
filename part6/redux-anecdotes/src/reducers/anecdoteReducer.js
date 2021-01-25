@@ -34,8 +34,8 @@ const reducer = (state = initialState, action) => {
       }
 
       return state.map((anec) => 
-        anec.id !== id ? anec : voted
-      );
+        anec.id !== id ? anec : voted).sort((a, b) => 
+          b.votes - a.votes); // sort by the most number of votes
     case 'NEW_ANECDOTE':
       return [...state, asObject(action.data.anecdote)];
     default:
