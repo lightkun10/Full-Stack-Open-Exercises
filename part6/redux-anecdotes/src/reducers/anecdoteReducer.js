@@ -1,3 +1,5 @@
+// import setNotifMessage from './notificationReducer';
+
 const anecdotesAtStart = [
   'If it hurts, do it more often',
   'Adding manpower to a late software project makes it later!',
@@ -20,8 +22,8 @@ const asObject = (anecdote) => {
 const initialState = anecdotesAtStart.map(asObject)
 
 const reducer = (state = initialState, action) => {
-  console.log('state now: ', state);
-  console.log('action', action.type);
+  // console.log('state now: ', state);
+  // console.log('action', action.type);
 
   switch (action.type) {
     case 'VOTE':
@@ -33,6 +35,7 @@ const reducer = (state = initialState, action) => {
         votes: anecToChange.votes + 1
       }
 
+      // setNotifMessage(`you voted '${voted.content}'`);
       return state.map((anec) => 
         anec.id !== id ? anec : voted).sort((a, b) => 
           b.votes - a.votes); // sort by the most number of votes

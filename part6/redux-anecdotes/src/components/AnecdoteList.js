@@ -2,6 +2,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleVote } from '../reducers/anecdoteReducer';
+import { setNotifMessage } from '../reducers/notificationReducer';
 
 const Anecdote = ({ content, votes, handleClick }) => {
   return (
@@ -19,7 +20,7 @@ const Anecdote = ({ content, votes, handleClick }) => {
 
 const AnecdoteList = (props) => {
   const dispatch = useDispatch();
-  const anecdotes = useSelector(state => state);
+  const anecdotes = useSelector(state => state.anecdotes);
 
   return (
     <div>
@@ -27,7 +28,10 @@ const AnecdoteList = (props) => {
         <Anecdote key={anecdote.id} 
           content={anecdote.content}
           votes={anecdote.votes}
-          handleClick={() => dispatch(toggleVote(anecdote.id))}
+          handleClick={() => {
+            dispatch(toggleVote(anecdote.id));
+            dispatch(setNotifMessage(`you voted '${anecdote.content}'`));
+          }}
         />
       )}
     </div>
