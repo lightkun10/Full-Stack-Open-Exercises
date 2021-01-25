@@ -43,4 +43,24 @@ const reducer = (state = initialState, action) => {
   }
 }
 
+/****************
+Action creators 
+****************/
+// https://redux.js.org/tutorials/fundamentals/part-6-async-logic#synchronous-action-creators
+export const createAnecdote = (value) => {
+  return {
+    type: 'NEW_ANECDOTE',
+    data: {
+      anecdote: value
+    }
+  }
+}
+
+export const toggleVote = (id) => {
+  return {
+    type: 'VOTE',
+    data: { id }
+  };
+}
+
 export default reducer
