@@ -2,7 +2,6 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { createAnecdote } from '../reducers/anecdoteReducer';
 import { setNotifMessage, clearMessage } from '../reducers/notificationReducer';
-import anecdoteService from '../services/anecdotes';
 
 const anecdoteForm = (props) => {
   // eslint-disable-next-line react-hooks/rules-of-hooks

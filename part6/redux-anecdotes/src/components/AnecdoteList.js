@@ -35,7 +35,7 @@ const AnecdoteList = (props) => {
           content={anecdote.content}
           votes={anecdote.votes}
           handleClick={() => {
-            dispatch(toggleVote(anecdote.id));
+            dispatch(toggleVote(anecdote));
 
             dispatch(setNotifMessage(`you voted '${anecdote.content}'`));
 
