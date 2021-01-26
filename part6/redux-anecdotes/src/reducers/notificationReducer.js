@@ -16,6 +16,28 @@ const notificationReducer = (state = initialState, action) => {
   }
 }
 
+/*********************
+*?  Action creators 
+*********************/
+
+let timeoutID;
+
+export const setNotification = (message, time) => {
+  return async dispatch => {
+    dispatch(setNotifMessage(message));
+
+    if (timeoutID) clearTimeout(timeoutID);
+
+    timeoutID = setTimeout(() => {
+      dispatch(clearNotification());
+    }, time * 1000);
+  }
+}
+
+/**
+ * Extra functions
+ */
+
 export const setNotifMessage = (message) => {
   return {
     type: 'SET_MESSAGE',
@@ -31,15 +53,6 @@ export const clearNotification = () => {
     data: {
       message: 'clear'
     }
-  }
-}
-
-export const setNotification = (message, time) => {
-  return async dispatch => {
-    dispatch(setNotifMessage(message));
-    setTimeout(() => {
-      dispatch(clearNotification());
-    }, time);
   }
 }
 

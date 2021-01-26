@@ -10,7 +10,7 @@ const anecdoteForm = (props) => {
     event.target.anecdote.value = '';
     props.createAnecdote(value);
 
-    props.setNotification(`new anecdote '${value}'`, 5000);
+    props.setNotification(`new anecdote '${value}'`, 5);
   }
   
   return (
