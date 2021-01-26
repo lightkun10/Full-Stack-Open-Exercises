@@ -6,7 +6,7 @@ import store from './store';
 
 // const store = createStore(reducer);
 
-console.log(store.getState());
+// console.log(store.getState());
 
 ReactDOM.render(
   <Provider store={store}>
