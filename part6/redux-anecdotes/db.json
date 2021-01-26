@@ -1,5 +1,5 @@
 {
-  "anecdotes":[
+  "anecdotes": [
     {
       "content": "If it hurts, do it more often",
       "id": "47145",
@@ -29,6 +29,31 @@
       "content": "Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.",
       "id": "98312",
       "votes": 0
+    },
+    {
+      "content": "I like talking to myself. It is one of my greatest pleasures. I often have long conversations all by myself, and I am so clever sometimes I don't understand a single word of what I am saying.",
+      "votes": 0,
+      "id": "usdxKwt"
+    },
+    {
+      "content": "You know, when I was a kid, my dog was my best friend. My childhood was better because of him.",
+      "votes": 0,
+      "id": "5A9HbJF"
+    },
+    {
+      "content": "I was an owl last year—it was a real hoot!",
+      "votes": 0,
+      "id": "V8PiVIc"
+    },
+    {
+      "content": "I would rather be an artist than a leader. Ironically, a leader has to follow the rules",
+      "votes": 0,
+      "id": "PSA7uew"
+    },
+    {
+      "content": "A friend is not the shadow that mimics you, but the one who casts all shadows away",
+      "votes": 0,
+      "id": "3O2sViW"
     }
   ]
 }
