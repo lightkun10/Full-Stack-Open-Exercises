@@ -1,19 +1,16 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
+import { connect } from 'react-redux';
 import { createAnecdote } from '../reducers/anecdoteReducer';
 import { setNotification } from '../reducers/notificationReducer';
 
 const anecdoteForm = (props) => {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const dispatch = useDispatch();
-
   const addAnecdote = async (event) => {
     event.preventDefault();
     const value = event.target.anecdote.value;
     event.target.anecdote.value = '';
-    dispatch(createAnecdote(value));
+    props.createAnecdote(value);
 
-    dispatch(setNotification(`new anecdote '${value}'`, 5000));
+    props.setNotification(`new anecdote '${value}'`, 5000);
   }
   
   return (
@@ -27,4 +24,12 @@ const anecdoteForm = (props) => {
   )
 }
 
-export default anecdoteForm;
+const mapDispatchToProps = {
+  createAnecdote,
+  setNotification,
+}
+
+export default connect(
+  null,
+  mapDispatchToProps,
+)(anecdoteForm);

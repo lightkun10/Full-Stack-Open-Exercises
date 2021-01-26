@@ -3,7 +3,7 @@
     {
       "content": "If it hurts, do it more often",
       "id": "47145",
-      "votes": 5
+      "votes": 10
     },
     {
       "content": "Adding manpower to a late software project makes it later!",
@@ -64,6 +64,11 @@
       "content": "A clever person solves a problem.",
       "votes": 0,
       "id": "UrcSdzS"
+    },
+    {
+      "content": "Programming today is a race between software engineers striving to build bigger and better idiot-proof programs, and the Universe trying to produce bigger and better idiots.",
+      "votes": 5,
+      "id": "UxuGR0v"
     }
   ]
 }

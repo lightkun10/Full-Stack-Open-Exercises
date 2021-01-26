@@ -37,7 +37,7 @@ const AnecdoteList = (props) => {
 }
 
 const mapStateToProps = (state) => {
-  console.log(state);
+  // console.log(state);
   if (state.filter === '') {
     return { anecdotes: state.anecdotes };
   }

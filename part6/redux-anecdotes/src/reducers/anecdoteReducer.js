@@ -1,8 +1,8 @@
 import anecdoteService from '../services/anecdotes';
 
 const anecdoteReducer = (state = [], action) => {
-  console.log('state now: ', state);
-  console.log('action', action.type);
+  // console.log('state now: ', state);
+  // console.log('action', action.type);
 
   switch (action.type) {
     case 'VOTE':
