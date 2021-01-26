@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { connect } from 'react-redux';
 import { toggleVote } from '../reducers/anecdoteReducer';
 import { setNotification } from '../reducers/notificationReducer';
 
@@ -19,25 +19,16 @@ const Anecdote = ({ content, votes, handleClick }) => {
 }
 
 const AnecdoteList = (props) => {
-  const dispatch = useDispatch();
-  const anecdotes = useSelector(state => 
-    !state.filter 
-    ? state.anecdotes
-    : state.anecdotes.filter((a) => 
-      a.content.toLowerCase().includes(state.filter.toLowerCase())
-    )
-  );
-
   return (
     <div>
-      {anecdotes.map(anecdote =>
+      {props.anecdotes.map(anecdote =>
         <Anecdote key={anecdote.id} 
           content={anecdote.content}
           votes={anecdote.votes}
           handleClick={() => {
-            dispatch(toggleVote(anecdote));
+            props.toggleVote(anecdote);
 
-            dispatch(setNotification(`you voted '${anecdote.content}'`, 5000));
+            props.setNotification(`you voted '${anecdote.content}'`, 5000);
           }}
         />
       )}
@@ -45,4 +36,26 @@ const AnecdoteList = (props) => {
   )
 }
 
-export default AnecdoteList;
+const mapStateToProps = (state) => {
+  console.log(state);
+  if (state.filter === '') {
+    return { anecdotes: state.anecdotes };
+  }
+
+  return {
+    anecdotes: state.anecdotes.filter((anecdote) =>
+      anecdote.content.toLowerCase().includes(state.filter.toLowerCase())
+    )
+  }
+}
+
+const mapDispatchToProps = {
+  toggleVote, setNotification
+}
+
+const ConnectedAnecdotes = connect(
+  mapStateToProps, 
+  mapDispatchToProps
+)(AnecdoteList);
+
+export default ConnectedAnecdotes;
