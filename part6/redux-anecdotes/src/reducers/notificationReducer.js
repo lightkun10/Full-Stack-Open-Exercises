@@ -10,7 +10,7 @@ const notificationReducer = (state = initialState, action) => {
   switch(action.type) {
     case 'SET_MESSAGE':
       return action.data;
-    case 'CLEAR_MESSAGE':
+    case 'CLEAR_NOTIFICATION':
       return initialState;
     default:
       return state;
@@ -26,12 +26,21 @@ export const setNotifMessage = (message) => {
   }
 }
 
-export const clearMessage = () => {
+export const clearNotification = () => {
   return {
-    type: 'CLEAR_MESSAGE',
+    type: 'CLEAR_NOTIFICATION',
     data: {
       message: 'clear'
     }
+  }
+}
+
+export const setNotification = (message, time) => {
+  return async dispatch => {
+    dispatch(setNotifMessage(message));
+    setTimeout(() => {
+      dispatch(clearNotification());
+    }, time);
   }
 }
 
