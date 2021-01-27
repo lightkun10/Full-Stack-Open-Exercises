@@ -3,6 +3,7 @@ import {
   BrowserRouter as Router,
   Switch, Route, 
   Link, useParams,
+  useHistory,
 } from 'react-router-dom';
 
 const AnecdoteList = ({ anecdotes }) => (
@@ -64,7 +65,6 @@ const CreateNew = (props) => {
   const [author, setAuthor] = useState('')
   const [info, setInfo] = useState('')
 
-
   const handleSubmit = (e) => {
     e.preventDefault()
     props.addNew({
@@ -72,7 +72,7 @@ const CreateNew = (props) => {
       author,
       info,
       votes: 0
-    })
+    });
   }
 
   return (
@@ -95,7 +95,12 @@ const CreateNew = (props) => {
       </form>
     </div>
   )
+}
 
+const Notification = ({ notification }) => {
+  return (
+    <div>{notification}</div>
+  )
 }
 
 const App = () => {
@@ -116,11 +121,19 @@ const App = () => {
     }
   ])
 
+  let history = useHistory();
+
   const [notification, setNotification] = useState('')
 
   const addNew = (anecdote) => {
     anecdote.id = (Math.random() * 10000).toFixed(0)
     setAnecdotes(anecdotes.concat(anecdote))
+    setNotification(`a new anecdote ${anecdote.content} created!`);
+    setTimeout(() => {
+      setNotification('');
+    }, 10000);
+    console.log(history);
+    history.push('/');
   }
 
   const anecdoteById = (id) =>
@@ -144,13 +157,14 @@ const App = () => {
   return (
     <div id="maincontent">
       <h1>Software anecdotes</h1>
-      <Router>
+      
         <div className="menu">
           <Link style={padding} to="/">anecdotes</Link>
           <Link style={padding} to="/create">create new</Link>
           <Link style={padding} to="/about">about</Link>
         </div>
 
+        <Notification notification={notification} />
         <Switch>
           <Route path="/anecdotes/:id">
             <Anecdote anecdotes={anecdotes} />
@@ -167,7 +181,6 @@ const App = () => {
         </Switch>
 
         <Footer />
-      </Router>
     </div>
   )
 }
