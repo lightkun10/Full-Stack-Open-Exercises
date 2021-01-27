@@ -27,3 +27,6 @@
 ## Part 6
 - Unicafe: Redux
 - Anecdotes: Redux
+
+## Part 7
+- Routed Anecdotes
