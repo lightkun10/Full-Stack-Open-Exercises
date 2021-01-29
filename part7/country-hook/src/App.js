@@ -21,7 +21,7 @@ const useCountry = (name) => {
 
   const hook = () => {
     axios.get(
-      `https://restcountries.eu/rest/v2/name/${name}`
+      `https://restcountries.eu/rest/v2/name/${name}?fullText=true`
     ).then((response) => {
       console.log(response['data'][0]);
       setCountry({ found: true, data: response['data'][0]});
