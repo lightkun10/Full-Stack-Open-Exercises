@@ -2,39 +2,51 @@ import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 
 const useField = (type) => {
-  const [value, setValue] = useState('')
+  const [value, setValue] = useState('');
 
   const onChange = (event) => {
-    setValue(event.target.value)
-  }
+    setValue(event.target.value);
+  };
+
 
   return {
     type,
     value,
     onChange
-  }
+  };
 }
 
 const useCountry = (name) => {
-  const [country, setCountry] = useState(null)
+  const [country, setCountry] = useState(null);
 
-  useEffect()
+  const hook = () => {
+    axios.get(
+      `https://restcountries.eu/rest/v2/name/${name}`
+    ).then((response) => {
+      console.log(response['data'][0]);
+      setCountry({ found: true, data: response['data'][0]});
+    }).catch((e) => {
+      console.log(e);
+      setCountry({ found: false });
+    })
+  };
+  useEffect(hook, [name]);
 
-  return country
+  return country;
 }
 
 const Country = ({ country }) => {
   if (!country) {
-    return null
-  }
+    return null;
+  };
 
   if (!country.found) {
     return (
       <div>
         not found...
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <div>
@@ -47,13 +59,13 @@ const Country = ({ country }) => {
 }
 
 const App = () => {
-  const nameInput = useField('text')
-  const [name, setName] = useState('')
-  const country = useCountry(name)
+  const nameInput = useField('text');
+  const [name, setName] = useState('');
+  const country = useCountry(name);
 
   const fetch = (e) => {
-    e.preventDefault()
-    setName(nameInput.value)
+    e.preventDefault();
+    setName(nameInput.value);
   }
 
   return (
@@ -68,4 +80,4 @@ const App = () => {
   )
 }
 
-export default App
+export default App;
