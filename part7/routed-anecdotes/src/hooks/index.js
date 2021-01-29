@@ -7,7 +7,9 @@ export const useField = (type) => {
     setValue(event.target.value);
   };
 
-  return { type, value, onChange };
+  const resetInput = () => setValue('');
+
+  return { type, value, onChange, resetInput };
 }
 
 export const CreateNew = (props) => {
@@ -44,6 +46,17 @@ export const CreateNew = (props) => {
           <input {...info} />
         </div>
         <button>create</button>
+        <button 
+          type='reset' 
+          onClick={
+            () => {
+              content.resetInput()
+              author.resetInput()
+              info.resetInput()
+            }
+          }>
+            reset
+        </button>
       </form>
     </div>
   )

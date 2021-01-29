@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import {
-  BrowserRouter as Router,
   Switch, Route, 
   Link, useParams,
   useHistory, useRouteMatch,
@@ -88,7 +87,7 @@ const App = () => {
   const [notification, setNotification] = useState('')
 
   const addNew = (anecdote) => {
-    console.log(anecdote);
+    // console.log(anecdote);
     anecdote.id = (Math.random() * 10000).toFixed(0)
     setAnecdotes(anecdotes.concat(anecdote));
     pushNotification(`a new anecdote ${anecdote.content} created!`);
