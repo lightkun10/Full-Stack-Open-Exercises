@@ -13,9 +13,9 @@ export const useField = (type) => {
 }
 
 export const CreateNew = (props) => {
-  const content = useField('text');
-  const author = useField('text');
-  const info = useField('text');
+  const {resetInput: resetContent,...content} = useField('text');
+  const {resetInput: resetAuthor, ...author} = useField('text');
+  const {resetInput: resetInfo, ...info} = useField('text');
 
   // console.log(content.value);
   const handleSubmit = (e) => {
@@ -27,6 +27,12 @@ export const CreateNew = (props) => {
       info: info.value,
       votes: 0,
     });
+  }
+
+  const handleReset = () => {
+    resetContent();
+    resetAuthor();
+    resetInfo();
   }
 
   return (
@@ -46,15 +52,7 @@ export const CreateNew = (props) => {
           <input {...info} />
         </div>
         <button>create</button>
-        <button 
-          type='reset' 
-          onClick={
-            () => {
-              content.resetInput()
-              author.resetInput()
-              info.resetInput()
-            }
-          }>
+        <button type='reset' onClick={handleReset}>
             reset
         </button>
       </form>
