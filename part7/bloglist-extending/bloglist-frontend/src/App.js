@@ -15,8 +15,8 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [errorMessage, setErrorMessage] = useState(null)
-  const [successMessage, setSuccessMessage] = useState(null)
+  // const [errorMessage, setErrorMessage] = useState(null)
+  // const [successMessage, setSuccessMessage] = useState(null)
 
   const dispatch = useDispatch(); // ! DELETE/MOVE LATER
   
@@ -79,10 +79,6 @@ const App = () => {
       setBlogs(sortByLikes(blogs.concat(blog)))
     } catch (exception) {
       console.log(exception)
-      // setErrorMessage(`${exception}`)
-      // setTimeout(() => {
-      //   setErrorMessage(null)
-      // }, 5000)
       dispatch(setNotification(`${exception}`, 'error', 5)); //! WATCH
     }
   }
@@ -102,11 +98,7 @@ const App = () => {
       setBlogs(sortByLikes(blogs.map((blog) => blog.id !== blogId ? blog : updated)))
     } catch(exception) {
       console.log(exception)
-      setErrorMessage(`Successfully ${exception}`)
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
-      setSuccessMessage(null)
+      dispatch(setNotification(`${exception}`, 'error', 5)); //! WATCH
     }
   }
 
@@ -118,11 +110,8 @@ const App = () => {
 
     try {
       await blogService.deleteBlog(id)
-      setSuccessMessage(`Deleted ${blog.title} by ${blog.author}`)
-      setTimeout(() => {
-        setSuccessMessage(null)
-      }, 5000)
-      setErrorMessage(null)
+      dispatch(setNotification(`Deleted ${blog.title} by ${blog.author}`, 'success', 5)); //! WATCH
+      
       // Update state of App component
       setBlogs(sortByLikes(blogs.filter((blog) => blog.id !== id)))
     } catch (exception) {
