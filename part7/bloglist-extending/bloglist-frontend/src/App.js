@@ -7,16 +7,13 @@ import Togglable from './components/Togglable'
 import AddBlogForm from './components/AddBlogForm'
 import { useDispatch } from 'react-redux';
 import { setNotification } from './reducers/notificationReducer';
+import LoginForm from './components/LoginForm';
 
 const sortByLikes = (blogs) => blogs.sort((a, b) => b.likes - a.likes)
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [user, setUser] = useState(null)
-  // const [errorMessage, setErrorMessage] = useState(null)
-  // const [successMessage, setSuccessMessage] = useState(null)
+  const [blogs, setBlogs] = useState([]);
+  const [user, setUser] = useState(null);
 
   const dispatch = useDispatch(); // ! DELETE/MOVE LATER
   
@@ -35,8 +32,7 @@ const App = () => {
     }
   }, [])
 
-  const handleLogin = async (event) => {
-    event.preventDefault()
+  const handleLogin = async ({ username, password }) => {
     try {
       const user = await loginService.login({
         username, password,
@@ -48,13 +44,10 @@ const App = () => {
 
       // console.log(user);
       blogService.setToken(user.token)
-      setUser(user)
-      dispatch(setNotification(`Successfully logged in as ${user.name}`, 'success', 5)); //! WATCH
-      setUsername('')
-      setPassword('')
+      dispatch(setNotification(`Successfully logged in as ${user.name}`, 'success', 5));
+      setUser(user);
     } catch (exception) {
-      // console.log(exception)
-      dispatch(setNotification('Wrong username or password', 'error', 5)); //! WATCH
+      dispatch(setNotification('Wrong username or password', 'error', 5));
     }
   }
 
@@ -119,40 +112,6 @@ const App = () => {
     }
   }
 
-  const loginForm = () => (
-    <div>
-      <h2>Log in to application</h2>
-
-      <Notification />
-
-      <form className="login__form" onSubmit={handleLogin}>
-        <div>
-          username
-          <input
-            id="username"
-            type="text"
-            value={username}
-            name="Username"
-            onChange={({ target }) => setUsername(target.value)}
-          />
-        </div>
-        <div>
-          password
-          <input
-            id="password"
-            type="password"
-            value={password}
-            name="Password"
-            onChange={({ target }) => setPassword(target.value)}
-          />
-        </div>
-        <button className="login__form__submit" 
-          type="submit">login
-        </button>
-      </form>
-    </div>
-  )
-
   const addBlogForm = () => (
     <Togglable buttonLabel="new blog">
       <AddBlogForm createBlog={handleAddBlog} />
@@ -163,8 +122,9 @@ const App = () => {
 
   // If user is not logged in
   if (user === null) {
+    // loginForm()
     return (
-      loginForm()
+      <LoginForm onLogin={handleLogin} />
     )
   }
 

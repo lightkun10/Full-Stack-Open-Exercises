@@ -1,14 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setNotification } from '../reducers/notificationReducer';
+import blogService from '../services/blogs'
+import loginService from '../services/login'
+import Notification from '../components/Notification';
 
-const loginForm = () => {
+const LoginForm = (props) => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    props.onLogin({
+      username, password
+    }, () => {
+      setUsername('');
+    });
+    setPassword('');
+  }
 
   return (
     <div>
       <h2>Log in to application</h2>
 
-      {/* <Notification /> */}
+      <Notification />
 
       <form className="login__form" onSubmit={handleLogin}>
         <div>
@@ -39,4 +54,4 @@ const loginForm = () => {
   )
 }
 
-export default loginForm;
+export default LoginForm;

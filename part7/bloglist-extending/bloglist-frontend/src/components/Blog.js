@@ -11,7 +11,6 @@ const Blog = ({ blog, addLike, onDelete }) => {
     marginBottom: 5
   }
 
-
   const handleVisibleClick = () => {
     setDetailVisible(detailVisible === 'view' ? 'hide' : 'view')
   }

@@ -2,9 +2,9 @@ import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 
 const AddBlogForm = ({ createBlog }) => {
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
+  const [title, setTitle] = useState('');
+  const [author, setAuthor] = useState('');
+  const [url, setUrl] = useState('');
 
   const handleTitleChange = (event) => {
     setTitle(event.target.value)
@@ -22,7 +22,7 @@ const AddBlogForm = ({ createBlog }) => {
     event.preventDefault()
     createBlog({
       title, author, url
-    })
+    });
 
     setTitle(''); setAuthor(''); setUrl('')
   }
