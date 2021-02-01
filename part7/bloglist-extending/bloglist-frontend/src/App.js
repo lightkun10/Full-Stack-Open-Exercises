@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import Blog from './components/Blog'
-import LoginNotification from './components/LoginNotification'
-import BlogCreateNotification from './components/BlogCreateNotification'
+import Notification from './components/Notification';
 import blogService from './services/blogs'
 import loginService from './services/login'
 import Togglable from './components/Togglable'
 import AddBlogForm from './components/AddBlogForm'
+import { useDispatch } from 'react-redux';
+import { setNotification } from './reducers/notificationReducer';
 
 const sortByLikes = (blogs) => blogs.sort((a, b) => b.likes - a.likes)
 
@@ -17,6 +18,8 @@ const App = () => {
   const [errorMessage, setErrorMessage] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
 
+  const dispatch = useDispatch(); // ! DELETE/MOVE LATER
+  
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs(sortByLikes(blogs))
@@ -41,25 +44,17 @@ const App = () => {
 
       window.localStorage.setItem(
         'loggedBlogAppUser', JSON.stringify(user)
-      )
+      );
 
       // console.log(user);
       blogService.setToken(user.token)
       setUser(user)
-      setSuccessMessage(`Successfully logged in as ${user.name}`)
-      setTimeout(() => {
-        setSuccessMessage(null)
-      }, 5000)
-      setErrorMessage(null)
+      dispatch(setNotification(`Successfully logged in as ${user.name}`, 'success', 5)); //! WATCH
       setUsername('')
       setPassword('')
     } catch (exception) {
-      console.log(exception)
-      setErrorMessage('Wrong username or password')
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
-      setSuccessMessage(null)
+      // console.log(exception)
+      dispatch(setNotification('Wrong username or password', 'error', 5)); //! WATCH
     }
   }
 
@@ -75,20 +70,20 @@ const App = () => {
       const blog = await blogService.createBlog({
         title, author, url,
       })
-      setSuccessMessage(`a new blog ${blog.title} by ${blog.author} added`)
-      setTimeout(() => {
-        setSuccessMessage(null)
-      }, 5000)
-      setErrorMessage(null)
+      dispatch(
+        setNotification(
+          `a new blog ${blog.title} by ${blog.author} added`, 'success', 5)
+      );
+
       // Update state of App component
       setBlogs(sortByLikes(blogs.concat(blog)))
     } catch (exception) {
       console.log(exception)
-      setErrorMessage(`${exception}`)
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
-      setSuccessMessage(null)
+      // setErrorMessage(`${exception}`)
+      // setTimeout(() => {
+      //   setErrorMessage(null)
+      // }, 5000)
+      dispatch(setNotification(`${exception}`, 'error', 5)); //! WATCH
     }
   }
 
@@ -139,7 +134,7 @@ const App = () => {
     <div>
       <h2>Log in to application</h2>
 
-      <LoginNotification errorMessage={errorMessage} />
+      <Notification />
 
       <form className="login__form" onSubmit={handleLogin}>
         <div>
@@ -191,7 +186,7 @@ const App = () => {
       <div className="header">
         <h2>blogs</h2>
 
-        <BlogCreateNotification successMessage={successMessage} />
+        <Notification />
 
         {user.name} logged in
         <button onClick={handleLogout}>logout</button>
