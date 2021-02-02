@@ -11,11 +11,63 @@ import { setNotification } from './reducers/notificationReducer';
 import { setUser } from './reducers/userReducer';
 import { useUsers } from './hooks/index';
 import {
-  BrowserRouter as Router,
-  Switch, Route
+  Switch, Route, useParams,
+  useRouteMatch,
+  Link,
 } from "react-router-dom"
 
-const sortByLikes = (blogs) => blogs.sort((a, b) => b.likes - a.likes)
+const sortByLikes = (blogs) => blogs.sort((a, b) => b.likes - a.likes);
+
+const Users = ({ users }) => {
+  return (
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th>blogs created</th>
+        </tr>
+      </thead>
+      <tbody>
+        {users.map((user) =>
+          <tr key={user.id}>
+              <td>
+                <Link to={`/users/${user.id}`}>{user.name}</Link>
+              </td>
+            <td>{user.blogs.length}</td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  )
+}
+
+const User = ({ user }) => {
+  if (!user) return <div>Please wait...</div>;
+
+  return (
+    <div className="user__profile">
+      <div className="user__profil_name">
+        <h2>{user.name}</h2>
+      </div>
+      <div className="user__profile_blogs">
+        <div className="user__profile_blogs_header">
+          <strong>added blogs</strong>
+        </div>
+        <div className="user__profile_blogs_list">
+          <ul>
+            {user.blogs.map((blog) => {
+              return (
+                <li key={blog.id}>
+                  {blog.title}
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -37,6 +89,11 @@ const App = () => {
       dispatch(setUser(user));
     }
   }, [dispatch])
+
+  const match = useRouteMatch('/users/:id');
+  const userMatch = match
+    ? users.find((user) => user.id === match.params.id)
+    : null;
 
   const handleLogin = async ({ username, password }) => {
     try {
@@ -134,61 +191,42 @@ const App = () => {
   // console.log(blogs);
 
   return (
-    <Router>
-      <div id="maincontent">
-        <div className="header">
-          <h2>blogs</h2>
+    <div id="maincontent">
+      <div className="header">
+        <h1>blogs</h1>
 
-          <Notification />
+        <Notification />
 
-          {user.name} logged in
-          <button onClick={handleLogout}>logout</button>
-        </div>
-
-        <Switch>
-          <Route path="/users">
-            {users.map((user) => 
-              <div key={user.id}>
-                {user.name} --- {user.blogs.length}
-              </div>
-            )}
-          </Route>
-
-          <Route path="/">
-            {addBlogForm()}
-            {blogs.map((blog) =>
-              <Blog
-                key={blog.id}
-                blog={blog}
-                addLike={() => handleLike(blog)}
-                onDelete={
-                  blog.user && blog.user.username === user.username ?
-                    () => handleDelete(blog) :
-                    null
-                }
-              />
-            )}
-            
-            <table>
-              <thead>
-                <tr>
-                  <th></th>
-                  <th>blogs created</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((user) =>
-                  <tr key={user.id}>
-                    <td>{user.name}</td>
-                    <td>{user.blogs.length}</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </Route>
-        </Switch>
+        {user.name} logged in
+        <button onClick={handleLogout}>logout</button>
       </div>
-    </Router>
+
+      <Switch>
+        <Route path="/users/:id">
+          <User user={userMatch} />
+        </Route>
+
+        <Route path="/users">
+          <Users users={users} />
+        </Route>
+
+        <Route path="/">
+          {addBlogForm()}
+          {blogs.map((blog) =>
+            <Blog
+              key={blog.id}
+              blog={blog}
+              addLike={() => handleLike(blog)}
+              onDelete={
+                blog.user && blog.user.username === user.username ?
+                  () => handleDelete(blog) :
+                  null
+              }
+            />
+          )}
+        </Route>
+      </Switch>
+    </div>
   )
 }
 
