@@ -5,32 +5,38 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 import Togglable from './components/Togglable'
 import AddBlogForm from './components/AddBlogForm'
-import { useDispatch } from 'react-redux';
-import { setNotification } from './reducers/notificationReducer';
+import { useDispatch, useSelector } from 'react-redux';
 import LoginForm from './components/LoginForm';
+import { setNotification } from './reducers/notificationReducer';
+import { setUser } from './reducers/userReducer';
+import { useUsers } from './hooks/index';
+import {
+  BrowserRouter as Router,
+  Switch, Route
+} from "react-router-dom"
 
 const sortByLikes = (blogs) => blogs.sort((a, b) => b.likes - a.likes)
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
-  const [user, setUser] = useState(null);
-
   const dispatch = useDispatch(); // ! DELETE/MOVE LATER
-  
+  const user = useSelector(state => state.user);
+  const [users, ] = useUsers('http://localhost:3003/api/users');
+
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs(sortByLikes(blogs))
-    )
+    );
   }, [])
 
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
+    const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser');
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       blogService.setToken(user.token)
-      setUser(user)
+      dispatch(setUser(user));
     }
-  }, [])
+  }, [dispatch])
 
   const handleLogin = async ({ username, password }) => {
     try {
@@ -45,17 +51,16 @@ const App = () => {
       // console.log(user);
       blogService.setToken(user.token)
       dispatch(setNotification(`Successfully logged in as ${user.name}`, 'success', 5));
-      setUser(user);
+      dispatch(setUser(user));
     } catch (exception) {
       dispatch(setNotification('Wrong username or password', 'error', 5));
     }
   }
 
   const handleLogout = async () => {
-    // event.preventDefault();
-    window.localStorage.removeItem('loggedBlogAppUser')
-    blogService.setToken(null)
-    setUser(null)
+    window.localStorage.removeItem('loggedBlogAppUser');
+    blogService.setToken(null);
+    dispatch(setUser(null));
   }
 
   const handleAddBlog = async ({ title, author, url }) => {
@@ -118,45 +123,73 @@ const App = () => {
     </Togglable>
   )
 
-  // console.log(user);
-
   // If user is not logged in
   if (user === null) {
-    // loginForm()
     return (
       <LoginForm onLogin={handleLogin} />
     )
   }
 
+  console.log(users);
   // console.log(blogs);
 
   return (
-    <div id="maincontent">
-      <div className="header">
-        <h2>blogs</h2>
+    <Router>
+      <div id="maincontent">
+        <div className="header">
+          <h2>blogs</h2>
 
-        <Notification />
+          <Notification />
 
-        {user.name} logged in
-        <button onClick={handleLogout}>logout</button>
+          {user.name} logged in
+          <button onClick={handleLogout}>logout</button>
+        </div>
+
+        <Switch>
+          <Route path="/users">
+            {users.map((user) => 
+              <div key={user.id}>
+                {user.name} --- {user.blogs.length}
+              </div>
+            )}
+          </Route>
+
+          <Route path="/">
+            {addBlogForm()}
+            {blogs.map((blog) =>
+              <Blog
+                key={blog.id}
+                blog={blog}
+                addLike={() => handleLike(blog)}
+                onDelete={
+                  blog.user && blog.user.username === user.username ?
+                    () => handleDelete(blog) :
+                    null
+                }
+              />
+            )}
+            
+            <table>
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>blogs created</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((user) =>
+                  <tr key={user.id}>
+                    <td>{user.name}</td>
+                    <td>{user.blogs.length}</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </Route>
+        </Switch>
       </div>
-
-      {addBlogForm()}
-
-      {blogs.map((blog) =>
-        <Blog
-          key={blog.id}
-          blog={blog}
-          addLike={() => handleLike(blog)}
-          onDelete={
-            blog.user && blog.user.username === user.username ?
-              () => handleDelete(blog) :
-              null
-          }
-        />
-      )}
-    </div>
+    </Router>
   )
 }
 
-export default App
+export default App;
