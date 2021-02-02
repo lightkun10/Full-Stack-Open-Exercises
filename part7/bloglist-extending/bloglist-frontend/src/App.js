@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react'
-import Blog from './components/Blog'
+import React, { useEffect } from 'react';
+import Blogs from './components/Blogs';
+import Blog from './components/Blog';
 import Notification from './components/Notification';
 import blogService from './services/blogs'
 import loginService from './services/login'
@@ -11,10 +12,11 @@ import { setNotification } from './reducers/notificationReducer';
 import { setUser } from './reducers/userReducer';
 import { useUsers } from './hooks/index';
 import {
-  Switch, Route, useParams,
+  Switch, Route, //useParams,
   useRouteMatch,
-  Link,
+  Link, useHistory
 } from "react-router-dom"
+import { createBlog, deleteBlog, initializeBlogs, toggleLike } from './reducers/blogReducer';
 
 const sortByLikes = (blogs) => blogs.sort((a, b) => b.likes - a.likes);
 
@@ -70,29 +72,35 @@ const User = ({ user }) => {
 }
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
-  const dispatch = useDispatch(); // ! DELETE/MOVE LATER
+  // const [blogs, setBlogs] = useState([]);
+  const blogs = useSelector(state => sortByLikes(state.blogs));
+  const dispatch = useDispatch();
   const user = useSelector(state => state.user);
   const [users, ] = useUsers('http://localhost:3003/api/users');
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs(sortByLikes(blogs))
-    );
-  }, [])
+    dispatch(initializeBlogs());
+  }, [dispatch])
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser');
     if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON)
-      blogService.setToken(user.token)
+      const user = JSON.parse(loggedUserJSON);
+      blogService.setToken(user.token);
       dispatch(setUser(user));
     }
-  }, [dispatch])
+  }, [dispatch]);
 
-  const match = useRouteMatch('/users/:id');
-  const userMatch = match
-    ? users.find((user) => user.id === match.params.id)
+  const history = useHistory();
+
+  const uMatch = useRouteMatch('/users/:id');
+  const userMatch = uMatch
+    ? users.find((user) => user.id === uMatch.params.id)
+    : null;
+
+  const bMatch = useRouteMatch('/blogs/:id');
+  const blogMatch = bMatch
+    ? blogs.find((blog) => blog.id === bMatch.params.id)
     : null;
 
   const handleLogin = async ({ username, password }) => {
@@ -122,24 +130,20 @@ const App = () => {
 
   const handleAddBlog = async ({ title, author, url }) => {
     try {
-      const blog = await blogService.createBlog({
-        title, author, url,
-      })
+      dispatch(createBlog({ title, author, url }));
+
       dispatch(
         setNotification(
-          `a new blog ${blog.title} by ${blog.author} added`, 'success', 5)
+          `a new blog ${title} by ${author} added`, 'success', 5)
       );
-
-      // Update state of App component
-      setBlogs(sortByLikes(blogs.concat(blog)))
     } catch (exception) {
       console.log(exception)
-      dispatch(setNotification(`${exception}`, 'error', 5)); //! WATCH
+      dispatch(setNotification(`${exception}`, 'error', 5));
     }
   }
 
   const handleLike = async (blog) => {
-    const blogId = blog.id
+    const blogId = blog.id;
     const updatedBlog = {
       user: blog.user.id,
       likes: blog.likes + 1,
@@ -148,29 +152,25 @@ const App = () => {
       url: blog.url,
     }
     try {
-      const updated = await blogService.updateBlog(blogId, updatedBlog)
-      // Update state of App component
-      setBlogs(sortByLikes(blogs.map((blog) => blog.id !== blogId ? blog : updated)))
+      dispatch(toggleLike(blogId, updatedBlog));
     } catch(exception) {
       console.log(exception)
-      dispatch(setNotification(`${exception}`, 'error', 5)); //! WATCH
+      dispatch(setNotification(`${exception}`, 'error', 5));
     }
   }
 
   const handleDelete = async (blog) => {
     if (!window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
-      return
+      return;
     }
-    const id = blog.id
 
+    const id = blog.id;
     try {
-      await blogService.deleteBlog(id)
-      dispatch(setNotification(`Deleted ${blog.title} by ${blog.author}`, 'success', 5)); //! WATCH
-      
-      // Update state of App component
-      setBlogs(sortByLikes(blogs.filter((blog) => blog.id !== id)))
+      dispatch(deleteBlog(id));
+      dispatch(setNotification(`Deleted ${blog.title} by ${blog.author}`, 'success', 5));
+      history.push('/');
     } catch (exception) {
-      console.log(exception)
+      console.log(exception);
     }
   }
 
@@ -187,18 +187,24 @@ const App = () => {
     )
   }
 
-  console.log(users);
+  // console.log(users);
   // console.log(blogs);
+  // console.log(user);
+
+  const padding = { padding: 5};
 
   return (
     <div id="maincontent">
       <div className="header">
-        <h1>blogs</h1>
+        <div className="links">
+          <Link style={padding} to="/">blogs</Link>
+          <Link style={padding} to="/users">users</Link>
+          {`${user.name}`} logged in <button onClick={handleLogout}>logout</button>
+        </div>
+
+        <h1>blog app</h1>
 
         <Notification />
-
-        {user.name} logged in
-        <button onClick={handleLogout}>logout</button>
       </div>
 
       <Switch>
@@ -210,18 +216,24 @@ const App = () => {
           <Users users={users} />
         </Route>
 
+        <Route path="/blogs/:id">
+          <Blog 
+            blog={blogMatch}
+            addLike={() => handleLike(blogMatch)}
+            onDelete={
+              blogMatch && blogMatch.user.username === user.username ?
+                () => handleDelete(blogMatch) :
+                null
+            }
+            />
+        </Route>
+
         <Route path="/">
           {addBlogForm()}
           {blogs.map((blog) =>
-            <Blog
+            <Blogs
               key={blog.id}
               blog={blog}
-              addLike={() => handleLike(blog)}
-              onDelete={
-                blog.user && blog.user.username === user.username ?
-                  () => handleDelete(blog) :
-                  null
-              }
             />
           )}
         </Route>
