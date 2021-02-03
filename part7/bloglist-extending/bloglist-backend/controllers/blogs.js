@@ -8,15 +8,7 @@ const jwt = require('jsonwebtoken');
 const Blog = require('../models/blog');
 const User = require('../models/user');
 
-/** SECTION: Fetching all blogs from database */
-blogsRouter.get('/', async (request, response) => {
-  const blogs = await Blog
-    .find({}).populate('user', { username: 1, name: 1 });
-
-  response.json(blogs);
-});
-
-/** SECTION: Adding a new blog to the database */
+/** CREATE a new blog to the database */
 blogsRouter.post('/', async (request, response) => {
   const blog = new Blog(request.body);
 
@@ -45,7 +37,26 @@ blogsRouter.post('/', async (request, response) => {
   response.status(201).json(savedBlog);
 });
 
-/** SECTION: Deleting a blog from database */
+/** READ all blogs from database */
+blogsRouter.get('/', async (request, response) => {
+  const blogs = await Blog
+    .find({}).populate('user', { username: 1, name: 1 });
+
+  response.json(blogs);
+});
+
+/** UPDATE a blog likes from database */
+blogsRouter.put('/:id', async (request, response) => {
+  const { body } = request;
+
+  const updatedBlog = await Blog.findByIdAndUpdate(
+    request.params.id, body, { new: true },
+  );
+
+  response.json(updatedBlog.toJSON());
+});
+
+/** DELETE a blog from database */
 blogsRouter.delete('/:id', async (request, response) => {
   const decodedToken = jwt.verify(request.token, process.env.SECRET);
   if (!request.token || !decodedToken) {
@@ -66,15 +77,26 @@ blogsRouter.delete('/:id', async (request, response) => {
   response.status(204).end();
 });
 
-/** SECTION: Updating a blog likes from database */
-blogsRouter.put('/:id', async (request, response) => {
-  const { body } = request;
+/** Adding comments to a blog */
+blogsRouter.post('/:id/comments', async (request, response) => {
+  const { comment } = request.body;
 
-  const updatedBlog = await Blog.findByIdAndUpdate(
-    request.params.id, body, { new: true },
+  if (!comment || comment.trim() === '') {
+    return response.status(400).json({ error: 'please provide a comment' });
+  }
+
+  const newComment = { comment };
+  const result = await Blog.findByIdAndUpdate(
+    request.params.id,
+    { $push: { comments: newComment } },
+    { new: true },
   );
 
-  response.json(updatedBlog.toJSON());
+  if (result === null) {
+    return response.status(404).json({ error: 'blog no longer exists' });
+  }
+
+  response.json(result.toJSON());
 });
 
 module.exports = blogsRouter;

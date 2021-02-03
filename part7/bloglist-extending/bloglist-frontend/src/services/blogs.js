@@ -27,11 +27,6 @@ const updateBlog = async(id, updatedBlog) => {
 }
 
 const deleteBlog = async(id) => {
-  // const config = {
-  // 	headers: { Authorization: token }
-  // };
-  // await axios.delete(`${baseUrl}/${id}`, config);
-
   await axios.delete(`${baseUrl}/${id}`, {
     headers: {
       'Content-Type': 'application/json',
@@ -40,7 +35,12 @@ const deleteBlog = async(id) => {
   })
 }
 
+const addComment = async (id, comment) => {
+  const response = await axios.post(`${baseUrl}/${id}/comments`, { comment });
+  return response.data;
+}
+
 export default { getAll, createBlog,
   setToken, updateBlog,
-  deleteBlog,
+  deleteBlog, addComment
 }

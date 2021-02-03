@@ -1,0 +1,6 @@
+POST http://localhost:3003/api/blogs/6018d66c35b78c156453e2a7/comments
+Content-Type: application/json
+
+{
+  "comment": "Interdasting..."
+}

@@ -60,7 +60,7 @@ const User = ({ user }) => {
             {user.blogs.map((blog) => {
               return (
                 <li key={blog.id}>
-                  {blog.title}
+                  <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
                 </li>
               )
             })}
@@ -145,11 +145,11 @@ const App = () => {
   const handleLike = async (blog) => {
     const blogId = blog.id;
     const updatedBlog = {
-      user: blog.user.id,
-      likes: blog.likes + 1,
       author: blog.author,
       title: blog.title,
       url: blog.url,
+      user: blog.user.id,
+      likes: blog.likes + 1,
     }
     try {
       dispatch(toggleLike(blogId, updatedBlog));
@@ -157,6 +157,11 @@ const App = () => {
       console.log(exception)
       dispatch(setNotification(`${exception}`, 'error', 5));
     }
+  }
+
+  const handleComment = async (blog, comment) => {
+    const blogId = blog.id;
+    console.log(comment);
   }
 
   const handleDelete = async (blog) => {
@@ -224,8 +229,7 @@ const App = () => {
               blogMatch && blogMatch.user.username === user.username ?
                 () => handleDelete(blogMatch) :
                 null
-            }
-            />
+            } />
         </Route>
 
         <Route path="/">

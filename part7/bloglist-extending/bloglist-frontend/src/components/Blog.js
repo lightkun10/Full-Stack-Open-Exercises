@@ -1,9 +1,31 @@
 import React, { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { addComment } from '../reducers/blogReducer';
 
-const Blog = ({ blog, addLike, onDelete }) => {
+const Blog = ({ blog, addLike, onDelete, onAddComment }) => {
+  const [comment, setComment] = useState('');
+  const dispatch = useDispatch();
+
   if (!blog) return <div>Please wait...</div>
 
-  console.log(blog);
+  const handleCommentChange = (event) => {
+    setComment(event.target.value)
+  }
+
+  const handleCommentSubmit = (event) => {
+    event.preventDefault();
+    // console.log(event.target.comment.value);
+    const comment = event.target.comment.value;
+    event.target.submit.disabled = true;
+    const button = event.target.submit;
+    dispatch(addComment(blog, comment, () => {
+      console.log(event.target.comment);
+      event.target.comment = '';
+      button.disabled = false;
+    }))
+  }
+
+  // console.log(blog);
   return (
     <div className="blog__content">
       <div className="blog__content-title">
@@ -11,7 +33,10 @@ const Blog = ({ blog, addLike, onDelete }) => {
       </div>
 
       <div className="blog__content-url">
-        <a className="blog__content-url-link" href={blog.url}>{blog.url}</a>
+        <a className="blog__content-url-link" 
+          href={blog.url}>
+            {blog.url}
+        </a>
       </div>
 
       <div className="blog__content-likes">
@@ -22,10 +47,42 @@ const Blog = ({ blog, addLike, onDelete }) => {
         added by {blog.user.name}
       </div>
 
-      {onDelete ?
-        <button id="deleteButton" onClick={onDelete}>remove</button> :
-        ''
-      }
+      <div className="blog__content-removeButton">
+        {onDelete ?
+          <button id="deleteButton" onClick={onDelete}>remove</button> :
+          ''
+        }
+      </div>
+      
+      <div className="blog__content-comments">
+        <h3>comments</h3>
+
+        <form className="blog__content-comments-form" onSubmit={handleCommentSubmit}>
+          <div className="blog__content-comments-form-comment">
+            <input
+              id="comment"
+              type="text"
+              value={comment}
+              name="Comment"
+              onChange={handleCommentChange}
+            />
+          </div>
+          
+          <button
+            className="blog__addform__form__submit"
+            type="submit">
+              add comment
+          </button>
+        </form>
+
+        <ul>
+          {blog.comments.map((comment) => 
+            <li key={comment.id}>
+              {comment.comment}
+            </li>
+          )}
+        </ul>
+      </div>
     </div>
   )
 }
