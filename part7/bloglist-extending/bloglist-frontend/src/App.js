@@ -3,25 +3,22 @@ import Blogs from './components/Blogs';
 import Users from './components/Users';
 import User from './components/User';
 import Blog from './components/Blog';
-import Notification from './components/Notification';
-import blogService from './services/blogs'
-import loginService from './services/login'
 import Togglable from './components/Togglable'
 import AddBlogForm from './components/AddBlogForm'
-import { useDispatch, useSelector } from 'react-redux';
 import LoginForm from './components/LoginForm';
+import MainHeader from './components/MainHeader';
+import blogService from './services/blogs'
+import loginService from './services/login'
+import { useDispatch, useSelector } from 'react-redux';
 import { setNotification } from './reducers/notificationReducer';
 import { setUser } from './reducers/userReducer';
 import { useUsers } from './hooks/index';
 import {
   Switch, Route, //useParams,
-  useRouteMatch,
-  Link, useHistory
+  useRouteMatch, useHistory
 } from "react-router-dom"
 import { createBlog, deleteBlog, initializeBlogs, toggleLike } from './reducers/blogReducer';
 import Container from '@material-ui/core/Container';
-import { Paper, TableBody, TableContainer, 
-  Table, TableRow, TableCell, AppBar, Button, Toolbar } from '@material-ui/core';
 
 const sortByLikes = (blogs) => blogs.sort((a, b) => b.likes - a.likes);
 
@@ -113,10 +110,10 @@ const App = () => {
     }
   }
 
-  const handleComment = async (blog, comment) => {
-    const blogId = blog.id;
-    console.log(comment);
-  }
+  // const handleComment = async (blog, comment) => {
+  //   const blogId = blog.id;
+  //   console.log(comment);
+  // }
 
   const handleDelete = async (blog) => {
     if (!window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
@@ -150,36 +147,14 @@ const App = () => {
   // console.log(blogs);
   // console.log(user);
 
-  const padding = { 
-    padding: 5,
-    paddingLeft: 30
-  };
+  // const padding = { 
+  //   padding: 5,
+  //   paddingLeft: 30
+  // };
 
   return (
     <Container>
-      <div className="header">
-        <AppBar position="static">
-          <Toolbar>
-            <Button color="inherit" component={Link} to="/">
-              blogs
-            </Button>
-            <Button color="inherit" component={Link} to="/users">
-              users
-            </Button>
-            
-            <span style={ padding }>
-              {`${user.name}`} logged in 
-              <Button color="inherit" onClick={handleLogout}>
-                logout
-              </Button>
-            </span>
-          </Toolbar>
-        </AppBar>
-
-        <h1>blog app</h1>
-
-        <Notification />
-      </div>
+      <MainHeader user={user} handleLogout={handleLogout} />
 
       <Switch>
         <Route path="/users/:id">
