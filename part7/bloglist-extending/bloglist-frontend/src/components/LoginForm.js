@@ -1,3 +1,4 @@
+import { Button, TextField } from '@material-ui/core';
 import React, { useState } from 'react';
 import Notification from '../components/Notification';
 
@@ -23,8 +24,8 @@ const LoginForm = (props) => {
 
       <form className="login__form" onSubmit={handleLogin}>
         <div>
-          username
-          <input
+          <TextField
+            label="username"
             id="username"
             type="text"
             value={username}
@@ -33,8 +34,8 @@ const LoginForm = (props) => {
           />
         </div>
         <div>
-          password
-          <input
+          <TextField
+            label="password"
             id="password"
             type="password"
             value={password}
@@ -42,9 +43,12 @@ const LoginForm = (props) => {
             onChange={({ target }) => setPassword(target.value)}
           />
         </div>
-        <button className="login__form__submit" 
-          type="submit">login
-        </button>
+        <Button
+          variant="contained" color="primary"
+          className="login__form__submit" 
+          type="submit">
+            login
+        </Button>
       </form>
     </div>
   )

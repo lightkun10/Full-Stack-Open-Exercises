@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import Blogs from './components/Blogs';
+import Users from './components/Users';
+import User from './components/User';
 import Blog from './components/Blog';
 import Notification from './components/Notification';
 import blogService from './services/blogs'
@@ -17,59 +19,11 @@ import {
   Link, useHistory
 } from "react-router-dom"
 import { createBlog, deleteBlog, initializeBlogs, toggleLike } from './reducers/blogReducer';
+import Container from '@material-ui/core/Container';
+import { Paper, TableBody, TableContainer, 
+  Table, TableRow, TableCell, AppBar, Button, Toolbar } from '@material-ui/core';
 
 const sortByLikes = (blogs) => blogs.sort((a, b) => b.likes - a.likes);
-
-const Users = ({ users }) => {
-  return (
-    <table>
-      <thead>
-        <tr>
-          <th></th>
-          <th>blogs created</th>
-        </tr>
-      </thead>
-      <tbody>
-        {users.map((user) =>
-          <tr key={user.id}>
-              <td>
-                <Link to={`/users/${user.id}`}>{user.name}</Link>
-              </td>
-            <td>{user.blogs.length}</td>
-          </tr>
-        )}
-      </tbody>
-    </table>
-  )
-}
-
-const User = ({ user }) => {
-  if (!user) return <div>Please wait...</div>;
-
-  return (
-    <div className="user__profile">
-      <div className="user__profil_name">
-        <h2>{user.name}</h2>
-      </div>
-      <div className="user__profile_blogs">
-        <div className="user__profile_blogs_header">
-          <strong>added blogs</strong>
-        </div>
-        <div className="user__profile_blogs_list">
-          <ul>
-            {user.blogs.map((blog) => {
-              return (
-                <li key={blog.id}>
-                  <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
-                </li>
-              )
-            })}
-          </ul>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 const App = () => {
   // const [blogs, setBlogs] = useState([]);
@@ -137,7 +91,7 @@ const App = () => {
           `a new blog ${title} by ${author} added`, 'success', 5)
       );
     } catch (exception) {
-      console.log(exception)
+      // console.log(exception)
       dispatch(setNotification(`${exception}`, 'error', 5));
     }
   }
@@ -196,16 +150,31 @@ const App = () => {
   // console.log(blogs);
   // console.log(user);
 
-  const padding = { padding: 5};
+  const padding = { 
+    padding: 5,
+    paddingLeft: 30
+  };
 
   return (
-    <div id="maincontent">
+    <Container>
       <div className="header">
-        <div className="links">
-          <Link style={padding} to="/">blogs</Link>
-          <Link style={padding} to="/users">users</Link>
-          {`${user.name}`} logged in <button onClick={handleLogout}>logout</button>
-        </div>
+        <AppBar position="static">
+          <Toolbar>
+            <Button color="inherit" component={Link} to="/">
+              blogs
+            </Button>
+            <Button color="inherit" component={Link} to="/users">
+              users
+            </Button>
+            
+            <span style={ padding }>
+              {`${user.name}`} logged in 
+              <Button color="inherit" onClick={handleLogout}>
+                logout
+              </Button>
+            </span>
+          </Toolbar>
+        </AppBar>
 
         <h1>blog app</h1>
 
@@ -228,21 +197,17 @@ const App = () => {
             onDelete={
               blogMatch && blogMatch.user.username === user.username ?
                 () => handleDelete(blogMatch) :
-                null
-            } />
+                null } 
+          />
         </Route>
 
         <Route path="/">
           {addBlogForm()}
-          {blogs.map((blog) =>
-            <Blogs
-              key={blog.id}
-              blog={blog}
-            />
-          )}
+          <br></br>
+          <Blogs blogs={blogs} />
         </Route>
       </Switch>
-    </div>
+    </Container>
   )
 }
 
