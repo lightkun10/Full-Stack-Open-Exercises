@@ -31,3 +31,5 @@
 ## Part 7
 - Routed Anecdotes
 - Country: Hook
+- Ultimate-Hooks
+- Extending Bloglist
