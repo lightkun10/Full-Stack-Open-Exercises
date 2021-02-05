@@ -1,4 +1,10 @@
-const { ApolloServer, gql } = require('apollo-server')
+const { ApolloServer, gql } = require('apollo-server');
+
+let findAuthorWritten = (authorName) => {
+  let count = 0;
+  books.forEach((book) => book.author === authorName ? count++ : "" );
+  return count;
+}
 
 let authors = [
   {
@@ -102,7 +108,7 @@ const typeDefs = gql`
   type Query {
     bookCount: Int!
     authorCount: Int!
-    allBooks: [Book!]!
+    allBooks(author: String): [Book!]!
     allAuthors: [Author!]!
   }
 `
@@ -111,24 +117,23 @@ const resolvers = {
   Query: {
     bookCount: () => books.length,
     authorCount: () => authors.length,
-    allBooks: () => books,
-    allAuthors: () => {
-      const newR = [];
-      
-      let findAuthorWritten = (authorName) => {
-        let count = 0;
-        books.forEach((book) => book.author === authorName ? count++ : "" );
-        return count;
-      }
+    allBooks: (root, args) => {
+      if (!args.author) return books;
 
+      return books.filter((book) => 
+        book.author === args.author
+      )
+    },
+    allAuthors: () => {
+      const result = [];
+      
       authors.map((author) => {
         let query = {};
-        // console.log(author);
         query.name = author.name;
         query.bookCount = findAuthorWritten(author.name);
-        newR.push(query);
+        result.push(query);
       });
-      return newR;
+      return result;
     }
   }
 }
