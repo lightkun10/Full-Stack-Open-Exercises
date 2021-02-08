@@ -1,5 +1,5 @@
   
-import React, { useState } from 'react'
+import React from 'react'
 import { useQuery } from '@apollo/client';
 import { ALL_AUTHORS } from '../queries';
 import EditAuthorBirth from './EditAuthorBirth';
@@ -43,7 +43,7 @@ const Authors = (props) => {
         </tbody>
       </table>
 
-      <EditAuthorBirth />
+      <EditAuthorBirth authors={authors} />
     </div>
   )
 }
