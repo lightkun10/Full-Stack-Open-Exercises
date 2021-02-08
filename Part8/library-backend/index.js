@@ -183,6 +183,7 @@ const resolvers = {
       }
     },
 
+    // For now limited to only edit the born year
     editAuthor: (root, args) => {
       console.log(`Result: ${args.name}, ${args.setBornTo}`);
       const author = authors.find((a) => a.name === args.name);

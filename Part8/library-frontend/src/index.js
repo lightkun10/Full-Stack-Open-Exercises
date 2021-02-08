@@ -4,7 +4,7 @@ import App from './App'
 
 import { 
   ApolloClient, HttpLink, ApolloProvider,
-  InMemoryCache, gql
+  InMemoryCache
 } from '@apollo/client';
 
 const client = new ApolloClient({
@@ -13,13 +13,6 @@ const client = new ApolloClient({
     uri: 'http://localhost:4000/',
   })
 });
-
-
-
-// client.query({ allAuthors })
-//   .then((response) => {
-//     console.log(response.data);
-//   });
 
 ReactDOM.render(
   <ApolloProvider client={client}>

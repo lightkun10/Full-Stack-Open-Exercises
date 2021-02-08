@@ -1,10 +1,13 @@
   
-import React from 'react'
+import React, { useState } from 'react'
 import { useQuery } from '@apollo/client';
 import { ALL_AUTHORS } from '../queries';
+import EditAuthorBirth from './EditAuthorBirth';
 
 const Authors = (props) => {
-  const authorsFetch = useQuery(ALL_AUTHORS);
+  const authorsFetch = useQuery(ALL_AUTHORS, {
+    pollInterval: 2000
+  });
   if (authorsFetch.loading) return <div>loading...</div>
   
   // console.log(authorsFetch.data.allAuthors);
@@ -18,6 +21,7 @@ const Authors = (props) => {
   return (
     <div>
       <h2>authors</h2>
+
       <table>
         <tbody>
           <tr>
@@ -39,6 +43,7 @@ const Authors = (props) => {
         </tbody>
       </table>
 
+      <EditAuthorBirth />
     </div>
   )
 }

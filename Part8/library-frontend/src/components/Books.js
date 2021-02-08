@@ -3,7 +3,9 @@ import { useQuery } from '@apollo/client';
 import { ALL_BOOKS } from '../queries';
 
 const Books = (props) => {
-  const booksFetch = useQuery(ALL_BOOKS);
+  const booksFetch = useQuery(ALL_BOOKS, {
+    pollInterval: 2000
+  });
   if (booksFetch.loading) return <div>loading...</div>
 
   // console.log(booksFetch.data);
