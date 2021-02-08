@@ -159,6 +159,7 @@ const resolvers = {
         query.name = author.name;
         query.born = author.born;
         query.bookCount = findAuthorWritten(author.name);
+        query.id = author.id;
         result.push(query);
       });
       return result;
