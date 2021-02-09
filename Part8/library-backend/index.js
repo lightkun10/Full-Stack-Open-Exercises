@@ -1,5 +1,22 @@
 const { ApolloServer, gql } = require('apollo-server');
+const mongoose = require('mongoose');
+const Author = require('./models/author');
+const Book = require('./models/book');
 const { v1: uuid } = require('uuid');
+
+const MONGODB_URI = 'mongodb+srv://fullstack:2dNnLMji1haISUAV@cluster0.fsm0d.mongodb.net/librarygraphql?retryWrites=true';
+
+console.log("Connecting to", MONGODB_URI);
+
+mongoose.connect(
+  MONGODB_URI, { 
+    useNewUrlParser: true, useUnifiedTopology: true, 
+    useFindAndModify: false, useCreateIndex: true }
+).then(() => {
+  console.log("connected to MongoDB")
+}).catch((error) => {
+  console.log("error connection to MongoDB:", error.message);
+});
 
 let findAuthorWritten = (authorName) => {
   let count = 0;
@@ -89,9 +106,9 @@ const typeDefs = gql`
   type Book {
     title: String!
     published: Int!
-    author: String!
-    id: ID!
+    author: Author!
     genres: [String!]!
+    id: ID!
   }
 
   type Author {
@@ -185,7 +202,7 @@ const resolvers = {
 
     // For now limited to only edit the born year
     editAuthor: (root, args) => {
-      console.log(`Result: ${args.name}, ${args.setBornTo}`);
+      // console.log(`Result: ${args.name}, ${args.setBornTo}`);
       const author = authors.find((a) => a.name === args.name);
       if (!author) return null;
 
