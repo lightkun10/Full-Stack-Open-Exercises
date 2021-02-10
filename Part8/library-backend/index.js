@@ -18,11 +18,11 @@ mongoose.connect(
   console.log("error connection to MongoDB:", error.message);
 });
 
-let findAuthorWritten = (authorName) => {
-  let count = 0;
-  books.forEach((book) => book.author === authorName ? count++ : "" );
-  return count;
-}
+// let findAuthorWritten = (authorName) => {
+//   let count = 0;
+//   books.forEach((book) => book.author === authorName ? count++ : "" );
+//   return count;
+// }
 
 let authors = [
   {
@@ -147,46 +147,67 @@ const resolvers = {
   Query: {
     bookCount: () => Book.collection.countDocuments(),
     authorCount: () => Author.collection.countDocuments(),
-    allBooks: async (root, args) => { // ! NO FIX YET
-      if (!args.author && !args.genre) {
-        return Book.find({});
-      };
+    allBooks: async (root, args) => {
+      let query = {};
 
-      // else if (args.author && !args.genre) {
-      //   return books.filter((book) =>
-      //     book.author === args.author
-      //   );
-      // }
+      if (args.author) {
+        const author = await Author.findOne({ name: args.author });
+        if (!author) return [];
 
-      // else if (!args.author && args.genre) {
-      //   return books.filter((book) =>
-      //     book.genres.includes(args.genre)
-      //   );
-      // }
+        query.author = author._id;
+      }
 
-      // else {
-      //   return books.filter((book) =>
-      //     book.author === args.author && book.genres.includes(args.genre)
-      //   );
-      // }
+      if (args.genre) query.genre = { $in: [author._id] };
+      
+      return Book.find(query).populate('author');
     },
-    allAuthors: (root, args) => {
-      return Author.find({});
-      // const result = [];
-      // authors.map((author) => {
-      //   let query = {};
-      //   query.name = author.name;
-      //   query.born = author.born;
-      //   query.bookCount = findAuthorWritten(author.name);
-      //   query.id = author.id;
-      //   result.push(query);
-      // });
-      // return result;
+    allAuthors: async (root, args) => {
+      const countAuthor = await Book.aggregate([
+          { $group: { _id: '$author', count: { $sum: 1 } } }
+      ]).allowDiskUse(true);
+      // console.log(countAuthor);
+
+      const countAuthorMap = new Map(countAuthor.map((author) => 
+        [author._id.toString(), author.count]
+      ));
+      // console.log(countAuthorMap);
+
+      const authors = await Author.find({});
+
+      for (let i = 0; i < authors.length; i++) {
+        authors[i].bookCount = countAuthorMap.get(authors[i]._id.toString()) || 0;
+      }
+      return authors;
     }
   },
 
   Mutation: {
     addBook: async (root, args) => {
+      if (!args.title) {
+        throw new UserInputError('title must be specified or too short', {
+          invalidArgs: args.title,
+        });
+      }
+
+      if (args.published <= 0) {
+        throw new UserInputError('published year must be specified', {
+          invalidArgs: args.published,
+        });
+      }
+
+      if (!args.author) {
+        throw new UserInputError('author name must specified', {
+          invalidArgs: args.author,
+        });
+      }
+
+      console.log(args.genres.length);
+      if (args.genres.length <= 0) {
+        throw new UserInputError('at least one genre name must specified', {
+          invalidArgs: args.genres,
+        });
+      }
+
       let author = await Author.findOne({ name: args.author });
 
       try {
@@ -196,13 +217,12 @@ const resolvers = {
         }
         let book = new Book({ ...args, author: author._id });
         await book.save();
+        return book;
       } catch(e) {
         throw new UserInputError(e.message, {
           invalidArgs: args,
         });
       }
-
-      return book;
     },
 
     // For now limited to only edit the born year
