@@ -1,4 +1,4 @@
-const { ApolloServer, gql } = require('apollo-server');
+const { ApolloServer, gql, UserInputError } = require('apollo-server');
 const mongoose = require('mongoose');
 const Author = require('./models/author');
 const Book = require('./models/book');
@@ -145,71 +145,81 @@ const typeDefs = gql`
 
 const resolvers = {
   Query: {
-    bookCount: () => books.length,
-    authorCount: () => authors.length,
-    allBooks: (root, args) => {
-      if (!args.author && !args.genre) return books;
+    bookCount: () => Book.collection.countDocuments(),
+    authorCount: () => Author.collection.countDocuments(),
+    allBooks: async (root, args) => { // ! NO FIX YET
+      if (!args.author && !args.genre) {
+        return Book.find({});
+      };
 
-      else if (args.author && !args.genre) {
-        return books.filter((book) =>
-          book.author === args.author
-        );
-      }
+      // else if (args.author && !args.genre) {
+      //   return books.filter((book) =>
+      //     book.author === args.author
+      //   );
+      // }
 
-      else if (!args.author && args.genre) {
-        return books.filter((book) =>
-          book.genres.includes(args.genre)
-        );
-      }
+      // else if (!args.author && args.genre) {
+      //   return books.filter((book) =>
+      //     book.genres.includes(args.genre)
+      //   );
+      // }
 
-      else {
-        return books.filter((book) =>
-          book.author === args.author && book.genres.includes(args.genre)
-        );
-      }
+      // else {
+      //   return books.filter((book) =>
+      //     book.author === args.author && book.genres.includes(args.genre)
+      //   );
+      // }
     },
-    allAuthors: () => {
-      const result = [];
-      
-      authors.map((author) => {
-        let query = {};
-        query.name = author.name;
-        query.born = author.born;
-        query.bookCount = findAuthorWritten(author.name);
-        query.id = author.id;
-        result.push(query);
-      });
-      return result;
+    allAuthors: (root, args) => {
+      return Author.find({});
+      // const result = [];
+      // authors.map((author) => {
+      //   let query = {};
+      //   query.name = author.name;
+      //   query.born = author.born;
+      //   query.bookCount = findAuthorWritten(author.name);
+      //   query.id = author.id;
+      //   result.push(query);
+      // });
+      // return result;
     }
   },
 
   Mutation: {
-    addBook: (root, args) => {
-      if (authors.filter((author) => author.name === args.author).length > 0) {
-        const book = { ...args, id: uuid() };
-        books = books.concat(book);
-        return book;
-      } else {
-        const author = { name: args.author, 
-          born: null, bookCount: 1, id: uuid() };
-        authors = authors.concat(author);
-        const book = { ...args, id: uuid() };
-        books = books.concat(book);
-        // console.log(books);
-        return book;
+    addBook: async (root, args) => {
+      let author = await Author.findOne({ name: args.author });
+
+      try {
+        if (!author) {
+          author = new Author({ name: args.author });
+          await author.save();
+        }
+        let book = new Book({ ...args, author: author._id });
+        await book.save();
+      } catch(e) {
+        throw new UserInputError(e.message, {
+          invalidArgs: args,
+        });
       }
+
+      return book;
     },
 
     // For now limited to only edit the born year
-    editAuthor: (root, args) => {
-      // console.log(`Result: ${args.name}, ${args.setBornTo}`);
-      const author = authors.find((a) => a.name === args.name);
+    editAuthor: async (root, args) => {
+      const author = await Author.findOne({ name:  args.name});
       if (!author) return null;
 
-      const updatedAuthor = { ...author, born: args.setBornTo };
-      authors = authors.map((a) => a.name === args.name ? updatedAuthor : a);
-      return updatedAuthor;
-    }
+      try {
+        author.born = args.setBornTo;
+        await author.save()
+      } catch(e) {
+        throw new UserInputError(e.message, {
+          invalidArgs: args,
+        })
+      }
+      return author;
+    },
   }
 }
 
