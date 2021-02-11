@@ -1,10 +1,13 @@
-const { ApolloServer, gql, UserInputError } = require('apollo-server');
+const { ApolloServer, gql, UserInputError, AuthenticationError } = require('apollo-server');
 const mongoose = require('mongoose');
 const Author = require('./models/author');
 const Book = require('./models/book');
-const { v1: uuid } = require('uuid');
+const User = require('./models/user');
+const jwt = require('jsonwebtoken');
 
-const MONGODB_URI = 'mongodb+srv://fullstack:2dNnLMji1haISUAV@cluster0.fsm0d.mongodb.net/librarygraphql?retryWrites=true';
+const JWT_SECRET = "thehashslinginslasher";
+const STATIC_PASSWORD = "secret";
+const MONGODB_URI = "mongodb+srv://fullstack:2dNnLMji1haISUAV@cluster0.fsm0d.mongodb.net/librarygraphql?retryWrites=true";
 
 console.log("Connecting to", MONGODB_URI);
 
@@ -24,85 +27,17 @@ mongoose.connect(
 //   return count;
 // }
 
-let authors = [
-  {
-    name: 'Robert Martin',
-    id: "afa51ab0-344d-11e9-a414-719c6709cf3e",
-    born: 1952,
-  },
-  {
-    name: 'Martin Fowler',
-    id: "afa5b6f0-344d-11e9-a414-719c6709cf3e",
-    born: 1963
-  },
-  {
-    name: 'Fyodor Dostoevsky',
-    id: "afa5b6f1-344d-11e9-a414-719c6709cf3e",
-    born: 1821
-  },
-  { 
-    name: 'Joshua Kerievsky', // birthyear not known
-    id: "afa5b6f2-344d-11e9-a414-719c6709cf3e",
-  },
-  { 
-    name: 'Sandi Metz', // birthyear not known
-    id: "afa5b6f3-344d-11e9-a414-719c6709cf3e",
-  },
-]
-
-let books = [
-  {
-    title: 'Clean Code',
-    published: 2008,
-    author: 'Robert Martin',
-    genres: ['refactoring'],
-    id: "afa5b6f4-344d-11e9-a414-719c6709cf3e",
-  },
-  {
-    title: 'Agile software development',
-    published: 2002,
-    author: 'Robert Martin',
-    genres: ['agile', 'patterns', 'design'],
-    id: "afa5b6f5-344d-11e9-a414-719c6709cf3e",
-  },
-  {
-    title: 'Refactoring, edition 2',
-    published: 2018,
-    author: 'Martin Fowler',
-    genres: ['refactoring'],
-    id: "afa5de00-344d-11e9-a414-719c6709cf3e",
-  },
-  {
-    title: 'Refactoring to patterns',
-    published: 2008,
-    author: 'Joshua Kerievsky',
-    genres: ['refactoring', 'patterns'],
-    id: "afa5de01-344d-11e9-a414-719c6709cf3e",
-  },  
-  {
-    title: 'Practical Object-Oriented Design, An Agile Primer Using Ruby',
-    published: 2012,
-    author: 'Sandi Metz',
-    genres: ['refactoring', 'design'],
-    id: "afa5de02-344d-11e9-a414-719c6709cf3e",
-  },
-  {
-    title: 'Crime and punishment',
-    published: 1866,
-    author: 'Fyodor Dostoevsky',
-    genres: ['classic', 'crime'],
-    id: "afa5de03-344d-11e9-a414-719c6709cf3e",
-  },
-  {
-    title: 'The Demon ',
-    published: 1872,
-    author: 'Fyodor Dostoevsky',
-    genres: ['classic', 'revolution'],
-    id: "afa5de04-344d-11e9-a414-719c6709cf3e",
-  },
-]
-
 const typeDefs = gql`
+  type User {
+    username: String!
+    favoriteGenre: String!
+    id: ID!
+  }
+
+  type Token {
+    value: String!
+  }
+
   type Book {
     title: String!
     published: Int!
@@ -126,6 +61,7 @@ const typeDefs = gql`
       genre: String
     ): [Book!]!
     allAuthors: [Author!]!
+    me: User
   }
 
   type Mutation {
@@ -140,6 +76,16 @@ const typeDefs = gql`
       name: String!
       setBornTo: Int!
     ): Author
+
+    createUser(
+      username: String!
+      favoriteGenre: String!
+    ): User
+
+    login(
+      username: String!
+      password: String!
+    ): Token
   }
 `
 
@@ -167,22 +113,29 @@ const resolvers = {
       ]).allowDiskUse(true);
       // console.log(countAuthor);
 
-      const countAuthorMap = new Map(countAuthor.map((author) => 
+      const countMap = new Map(countAuthor.map((author) => 
         [author._id.toString(), author.count]
       ));
-      // console.log(countAuthorMap);
 
-      const authors = await Author.find({});
+      let authors = await Author.find({});
 
       for (let i = 0; i < authors.length; i++) {
-        authors[i].bookCount = countAuthorMap.get(authors[i]._id.toString()) || 0;
+        authors[i].bookCount = countMap.get(authors[i]._id.toString()) || 0;
       }
+
       return authors;
+    },
+    me: (root, args, context) => {
+      return context.currentUser;
     }
   },
 
   Mutation: {
-    addBook: async (root, args) => {
+    addBook: async (root, args, { currentUser }) => {
+      if (!currentUser) {
+        throw new AuthenticationError("not authenticated")
+      }
+
       if (!args.title) {
         throw new UserInputError('title must be specified or too short', {
           invalidArgs: args.title,
@@ -201,7 +154,7 @@ const resolvers = {
         });
       }
 
-      console.log(args.genres.length);
+      // console.log(args.genres.length);
       if (args.genres.length <= 0) {
         throw new UserInputError('at least one genre name must specified', {
           invalidArgs: args.genres,
@@ -240,12 +193,50 @@ const resolvers = {
       }
       return author;
     },
-  }
+
+    createUser: (root, args) => {
+      const user = new User({
+        username: args.username,
+        favoriteGenre: args.favoriteGenre,
+      });
+
+      return user.save().catch((error) => {
+        throw new UserInputError(error.message, {
+          invalidArgs: args,
+        });
+      });
+    },
+
+    login: async (root, args) => {
+      const user = await User.findOne({ username: args.username });
+
+      if ( !user || args.password !== STATIC_PASSWORD ) {
+        throw new UserInputError("wrong credentials")
+      }
+
+      const userForToken = {
+        username: user.username,
+        id: user._id,
+      }
+
+      return { value: jwt.sign(userForToken, JWT_SECRET) }; // token
+    },
+  },
 }
 
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  context: async ({ req }) => {
+    const auth = req ? req.headers.authorization : null;
+    if (auth && auth.toLowerCase().startsWith('bearer ')) {
+      const decodedToken = jwt.verify(
+        auth.substring(7), JWT_SECRET
+      );
+      const currentUser = await User.findById(decodedToken.id).populate('friends');
+      return { currentUser };
+    }
+  }
 })
 
 server.listen().then(({ url }) => {
