@@ -1,11 +1,11 @@
 # Full Stack Open 2020 Exercises
 
-### Part 0 - Fundamentals of Web apps
+## Part 0 - Fundamentals of Web apps
 
 - Single page app
 - New note
 
-### Part 1 - Introduction to React
+## Part 1 - Introduction to React
 - Course Information
 - Unicafe
 - Anecdotes
