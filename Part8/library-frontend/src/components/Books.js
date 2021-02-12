@@ -15,6 +15,7 @@ const Books = (props) => {
   }
 
   const books = booksFetch.data.allBooks;
+  console.log(books);
 
   return (
     <div>
@@ -31,13 +32,21 @@ const Books = (props) => {
               published
             </th>
           </tr>
-          {books.map(a =>
-            <tr key={a.title}>
-              <td>{a.title}</td>
-              <td>{a.author}</td>
-              <td>{a.published}</td>
+          {/* {books.map((book) =>
+            <tr key={book.title}>
+              <td>{book.title}</td>
+              <td>{book.author}</td>
+              <td>{book.published}</td>
             </tr>
-          )}
+          )} */}
+
+          {books.map((book) => (
+            <tr key={book.title}>
+              <td>{book.title}</td>
+              <td>{book.author.name}</td>
+              <td>{book.published}</td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>

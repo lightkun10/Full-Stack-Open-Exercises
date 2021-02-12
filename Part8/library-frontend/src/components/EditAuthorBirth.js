@@ -12,7 +12,9 @@ const EditAuthorBirth = (props) => {
 
   const submitBirthChange = (event) => {
     event.preventDefault();
-    changeBirth({ variables: { name: authorName, birth: Number(authorBirth) } })
+    changeBirth({ 
+      variables: { name: authorName, birth: Number(authorBirth) } 
+    });
     setAuthorName('');
     setAuthorBirth('');
   }

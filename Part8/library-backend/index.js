@@ -179,7 +179,11 @@ const resolvers = {
     },
 
     // For now limited to only edit the born year
-    editAuthor: async (root, args) => {
+    editAuthor: async (root, args, { currentUser }) => {
+      if (!currentUser) {
+        throw new AuthenticationError("not authenticated")
+      }
+      
       const author = await Author.findOne({ name:  args.name});
       if (!author) return null;
 
