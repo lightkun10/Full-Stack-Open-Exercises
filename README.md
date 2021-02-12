@@ -35,4 +35,4 @@
 - Extending Bloglist
 
 ## Part 8 - GraphQL
-- Library - GraphQL
+- Library: GraphQL
