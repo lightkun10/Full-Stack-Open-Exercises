@@ -10,13 +10,12 @@ const Authors = (props) => {
   });
   if (authorsFetch.loading) return <div>loading...</div>
   
-  // console.log(authorsFetch.data.allAuthors);
-
   if (!props.show) {
     return null
   }
 
   const authors = authorsFetch.data.allAuthors;
+  // console.log(authors);
 
   return (
     <div>

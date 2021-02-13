@@ -12,7 +12,7 @@ const LoginForm = (props) => {
     }
   });
 
-  console.log(result.data);
+  // console.log(result.data);
 
   useEffect(() => {
     if (result.data) {

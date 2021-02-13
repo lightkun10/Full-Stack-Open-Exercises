@@ -14,6 +14,16 @@ const NewBook = (props) => {
     onError: (error) => {
       console.log(error);
       props.setError(error.graphQLErrors[0].message);
+    },
+    update: (store, response) => {
+      const dataInStore = store.readQuery({ query: ALL_BOOKS });
+      store.writeQuery({
+        query: ALL_BOOKS,
+        data: {
+          ...dataInStore,
+          allBooks: [ ...dataInStore.allBooks, response.data.addBook ]
+        }
+      });
     }
   });
 
