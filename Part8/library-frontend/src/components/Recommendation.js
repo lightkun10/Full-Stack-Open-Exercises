@@ -1,28 +1,34 @@
-import React from 'react';
-import { useQuery } from '@apollo/client';
-import { CURRENT_USER, ALL_BOOKS } from '../queries';
+import React, { useState, useEffect } from 'react';
+import { useQuery, useLazyQuery } from '@apollo/client';
+import { CURRENT_USER, BOOKS_BY_GENRE } from '../queries';
 
 const Recommendation = (props) => {
-  const currentUserFetch = useQuery(CURRENT_USER);
-  const booksFetch = useQuery(ALL_BOOKS, {
-    pollInterval: 2000
-  });
+  const [favoriteGenre, setFavoriteGenre] = useState(null);
+  const currentUser = useQuery(CURRENT_USER);
+  const [ booksByGenre, result ] = useLazyQuery(BOOKS_BY_GENRE);
 
-  if (currentUserFetch.loading && booksFetch.loading) 
-    return <div>loading...</div>
+  useEffect(() => {
+    if (currentUser.data) {
+      const genre = currentUser.data.me.favoriteGenre;
+      setFavoriteGenre(genre);
+      booksByGenre({ variables: { genre } })
+    }
+  }, [currentUser.data, booksByGenre]);
 
   if (!props.show) return null;
-    
-  const favGenre = currentUserFetch.data.me.favoriteGenre;
-  const books = booksFetch.data.allBooks;
-  // console.log(books);
+
+  if (currentUser.loading) return <div>loading...</div>
+
+  // console.log(result);
+
+  const books = result ? result.data.allBooks : [];
 
   return (
     <div>
       <h2>recommendation</h2>
 
       <div>
-        books in your favorite genre <strong>{favGenre}</strong>
+        books in your favorite genre <strong>{favoriteGenre}</strong>
       </div>
 
       <div>
@@ -37,17 +43,13 @@ const Recommendation = (props) => {
                 published
               </th>
             </tr>
-            {books.filter((book) =>
-              book.genres
-                .includes(favGenre))
-                .map((book) => (
-                  <tr key={book.title}>
-                    <td>{book.title}</td>
-                    <td>{book.author.name}</td>
-                    <td>{book.published}</td>
-                  </tr>
-                ))
-            }
+            {books.map((book) => 
+              <tr key={book.title}>
+                <td>{book.title}</td>
+                <td>{book.author.name}</td>
+                <td>{book.published}</td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

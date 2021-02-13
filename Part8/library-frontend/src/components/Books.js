@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/client';
 import { ALL_BOOKS } from '../queries';
 
 const Books = (props) => {
-  const [genre, setGenre] = useState('all genres');
+  const [genre, setGenre] = useState('all genre');
 
   const booksFetch = useQuery(ALL_BOOKS, {
     pollInterval: 2000
@@ -17,7 +17,7 @@ const Books = (props) => {
   }
 
   const displayBooks = () => {
-    if (genre === "all genres")  {
+    if (genre === "all genre")  {
       return (
         books.map((book) => (
           <tr key={book.title}>
@@ -51,7 +51,7 @@ const Books = (props) => {
       genreSet.add(genre);
     }
   }
-  // console.log(genreSet);
+  console.log(genreSet);
   const genres = Array.from(genreSet);
 
   return (
@@ -83,7 +83,7 @@ const Books = (props) => {
             {genre}
           </button>
         ))}
-        <button onClick={() => setGenre('all genres')}>all genres</button>
+        <button onClick={() => setGenre('all genre')}>all genres</button>
       </div>
     </div>
   )

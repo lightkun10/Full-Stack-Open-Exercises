@@ -103,7 +103,12 @@ const resolvers = {
         query.author = author._id;
       }
 
-      if (args.genre) query.genre = { $in: [author._id] };
+      // console.log(args.genre);
+      if (args.genre) {
+        query.genres = { $in: [args.genre] }
+      };
+
+      // Book.find( { genre: { $in: [args.genre] } } )
       
       return Book.find(query).populate('author');
     },
