@@ -8,7 +8,7 @@ const LoginForm = (props) => {
 
   const [login, result] = useMutation(LOGIN, {
     onError: (error) => {
-      props.setError(error.graphQLErrors[0].message)
+      props.setNotif(error.graphQLErrors[0].message, 'error')
     }
   });
 
@@ -21,7 +21,7 @@ const LoginForm = (props) => {
       localStorage.setItem('library-user-token', token);
       props.next();
     }
-  }, [result.data]);
+  }, [props, result.data]);
 
   const submit = async (event) => {
     event.preventDefault();

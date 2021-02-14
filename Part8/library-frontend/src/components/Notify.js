@@ -1,13 +1,25 @@
 import React from 'react';
 
 const Notify = (props) => {
-  if (!props.errorMessage) return null;
+  console.log(props.notifStatus);
 
-  return (
-    <div style={{color: 'red'}}>
-      {props.errorMessage}
-    </div>
-  )
+  if (props.notifStatus === 'success') {
+    return (
+      <div style={{color: 'green'}}>
+        {props.notifMessage}
+      </div>
+    )
+  };
+
+  if (props.notifStatus === 'error') {
+    return (
+      <div style={{color: 'red'}}>
+        {props.notifMessage}
+      </div>
+    )
+  }
+  
+  return null;
 }
 
 export default Notify;

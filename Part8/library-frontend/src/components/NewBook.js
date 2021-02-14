@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { useMutation } from '@apollo/client';
-import { ALL_BOOKS, CREATE_BOOK } from '../queries';
+import {
+  useQuery, useMutation, useSubscription, useApolloClient
+} from '@apollo/client'
+import { ALL_BOOKS, CREATE_BOOK, BOOK_ADDED } from '../queries';
 
 const NewBook = (props) => {
   const [title, setTitle] = useState('');
@@ -8,11 +10,10 @@ const NewBook = (props) => {
   const [published, setPublished] = useState('');
   const [genre, setGenre] = useState('');
   const [genres, setGenres] = useState([]);
-
   const [ createBook ] = useMutation(CREATE_BOOK, {
     onError: (error) => {
       console.log(error);
-      props.setError(error.graphQLErrors[0].message);
+      props.setNotif(error.graphQLErrors[0].message, 'error');
     },
     update: (store, response) => {
       const dataInStore = store.readQuery({ query: ALL_BOOKS });
@@ -26,14 +27,20 @@ const NewBook = (props) => {
     }
   });
 
+  // useSubscription(BOOK_ADDED, {
+  //   onSubscriptionData: ({ subscriptionData }) => {
+  //     console.log(subscriptionData);
+  //   }
+  // });
+
   if (!props.show) {
     return null
   }
 
   const submit = async (event) => {
-    event.preventDefault()
+    event.preventDefault();
     
-    console.log('add book...')
+    console.log('add book...');
 
     createBook({ variables: 
       { title, 
@@ -43,11 +50,13 @@ const NewBook = (props) => {
       } 
     });
 
-    setTitle('')
-    setPublished('')
-    setAuthor('')
-    setGenres([])
-    setGenre('')
+    props.setNotif(`Successfully add ${title}`, 'success');
+
+    setTitle('');
+    setPublished('');
+    setAuthor('');
+    setGenres([]);
+    setGenre('');
   }
 
   const addGenre = () => {

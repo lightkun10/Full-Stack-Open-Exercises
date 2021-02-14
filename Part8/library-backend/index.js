@@ -173,6 +173,14 @@ const resolvers = {
         });
       }
 
+      // Check if book with the same name already exist in db
+      let book = await Book.findOne({ title: args.title });
+      if (book) {
+        throw new UserInputError('book with the same name already exist', {
+          invalidArgs: args.title,
+        });
+      }
+
       let author = await Author.findOne({ name: args.author });
 
       try {
@@ -180,15 +188,17 @@ const resolvers = {
           author = new Author({ name: args.author });
           await author.save();
         }
-        let book = new Book({ ...args, author: author._id });
+        book = new Book({ ...args, author: author._id });
         await book.save();
-        pubsub.publish('BOOK_ADDED', { bookAdded: book });
-        return book;
       } catch(e) {
         throw new UserInputError(e.message, {
           invalidArgs: args,
         });
       }
+
+      book.author = author;
+      pubsub.publish('BOOK_ADDED', { bookAdded: book });
+      return book;
     },
 
     // For now limited to only edit the born year

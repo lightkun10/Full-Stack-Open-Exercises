@@ -51,7 +51,7 @@ const Books = (props) => {
       genreSet.add(genre);
     }
   }
-  console.log(genreSet);
+  // console.log(genreSet);
   const genres = Array.from(genreSet);
 
   return (

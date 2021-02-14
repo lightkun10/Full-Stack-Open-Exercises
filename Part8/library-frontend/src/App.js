@@ -5,12 +5,16 @@ import NewBook from './components/NewBook';
 import Notify from './components/Notify';
 import LoginForm from './components/LoginForm';
 import Recommendation from './components/Recommendation';
-import { useApolloClient } from '@apollo/client';
+import {
+  useQuery, useMutation, useSubscription, useApolloClient
+} from '@apollo/client';
+import { ALL_BOOKS, BOOK_ADDED } from './queries';
 
 const App = () => {
   const [token, setToken] = useState(null);
   const [page, setPage] = useState('authors');
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [notifMessage, setNotifMessage] = useState(null);
+  const [notifStatus, setNotifStatus] = useState('');
   const client = useApolloClient();
 
   useEffect(() => {
@@ -18,10 +22,34 @@ const App = () => {
     if ( token ) setToken(token);
   }, []);
 
-  const notify = (message) => {
-    setErrorMessage(message);
+  const updateCacheWith = (addedBook) => {
+    const includedIn = (set, object) => {
+      set.map((b) => b.id).includes(object.id)
+    }
+
+    const dataInStore = client.readQuery({ query: ALL_BOOKS });
+    if (!includedIn(dataInStore.allBooks, addedBook)) {
+      client.writeQuery({
+        query: ALL_BOOKS,
+        data: { allBooks: dataInStore.allBooks.concat(addedBook) }
+      });
+    }
+  }
+
+  useSubscription(BOOK_ADDED, {
+    onSubscriptionData: ({ subscriptionData }) => {
+      // console.log(subscriptionData);
+      const addedBook = subscriptionData.data.bookAdded;
+      notify(`${addedBook.title} added`, 'success');
+      updateCacheWith(addedBook);
+    }
+  });
+
+  const notify = (message, status) => {
+    setNotifMessage(message);
+    setNotifStatus(status);
     setTimeout(() => {
-      setErrorMessage(null);
+      setNotifMessage(null);
     }, 10000);
   }
 
@@ -33,7 +61,9 @@ const App = () => {
 
   return (
     <div>
-      <Notify errorMessage={errorMessage} />
+      <Notify 
+        notifMessage={notifMessage}
+        notifStatus={notifStatus} />
 
       <div>
         <button onClick={() => setPage('authors')}>authors</button>
@@ -61,7 +91,7 @@ const App = () => {
 
       <NewBook
         show={page === 'add'}
-        setError={notify}
+        setNotif={notify}
       />
 
       <Recommendation 
@@ -72,7 +102,7 @@ const App = () => {
         <LoginForm
           show={page === 'login'}
           setToken={setToken} 
-          setError={notify}
+          setNotif={notify}
           next={() => setPage('authors')}
         />
       )}
