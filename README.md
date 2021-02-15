@@ -36,3 +36,6 @@
 
 ## Part 8 - GraphQL
 - Library: GraphQL
+
+## Part 9 - Typescript
+- [bmi (Body Mass Index)](https://github.com/lightkun10/Typescript-exercises/tree/main/bmi)
