@@ -1,6 +1,9 @@
-interface inputs { height: number, weight: number };
+interface Inputs { 
+  height: number, 
+  weight: number 
+};
 
-const parseArguments = (args: Array<string>): inputs => {
+const parseArguments = (args: Array<string>): Inputs => {
   if (args.length < 4) throw new Error('Not enough arguments');
   if (args.length > 4) throw new Error('Too many arguments');
 
